@@ -1,25 +1,32 @@
--- Ejecutar en Supabase > SQL Editor antes de usar los formularios.
+-- Esquema REAL verificado en el proyecto Supabase de producción (2026-09-02),
+-- documentado por introspección vía REST porque difería del que había aquí antes.
+-- No es necesario volver a ejecutarlo si las tablas ya existen: es solo referencia
+-- para que el código HTML use los mismos nombres de columna que la base de datos.
+
 create table if not exists public.casos (
   id uuid primary key default gen_random_uuid(),
   modalidad text not null check (modalidad in ('Póster Científico', 'Ponencia Oral')),
   tipo_caso text not null,
   area text not null,
   titulo text not null,
-  datos jsonb not null default '{}'::jsonb,
-  created_at timestamptz not null default now()
+  dictamen text,
+  observaciones_comite text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 create table if not exists public.evaluaciones (
   id uuid primary key default gen_random_uuid(),
   caso_id uuid not null references public.casos(id),
-  jurado text not null,
-  categoria text not null default '',
+  jurado_nombre text not null,
+  categoria_jurado text,
+  fecha_evaluacion date default current_date,
   puntaje numeric not null,
-  puntaje_maximo numeric not null,
-  criterios jsonb not null default '{}'::jsonb,
-  observaciones text not null default '',
-  fecha_evaluacion date,
-  created_at timestamptz not null default now()
+  max_puntaje numeric not null,
+  puntajes_criterios jsonb not null default '{}'::jsonb,
+  observaciones text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 alter table public.casos enable row level security;
@@ -33,3 +40,13 @@ create policy "Permitir insertar evaluaciones"
   on public.evaluaciones for insert to anon with check (true);
 create policy "Permitir consultar evaluaciones"
   on public.evaluaciones for select to anon using (true);
+
+-- Nota: no existen políticas de UPDATE ni DELETE para el rol "anon" (verificado:
+-- un DELETE con la clave publicable no borra nada). Esto es correcto y deseable:
+-- el formulario público solo puede insertar y leer, nunca modificar ni borrar
+-- evaluaciones ya guardadas.
+
+-- Nota: por decisión del equipo, no se recogen ni almacenan datos del
+-- expositor (identificación, profesión, institución, correo, teléfono,
+-- coautores). El esquema no tiene esas columnas y los formularios HTML no
+-- las piden.
