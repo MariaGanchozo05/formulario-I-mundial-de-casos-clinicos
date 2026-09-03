@@ -50,7 +50,7 @@ header {
 .header-brand img { width: 52px; height: 52px; border-radius: 50%; background: #fff; padding: 2px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 header h1 { font-size: clamp(17px, 3vw, 26px); font-weight: 800; letter-spacing: -0.4px; }
 header h2 { font-size: clamp(12px, 1.8vw, 15px); font-weight: 500; opacity: 0.9; margin-top: 2px; }
-.restricted-tag {
+.public-tag {
   display: inline-flex; align-items: center; gap: 6px;
   background: rgba(255,255,255,0.18); backdrop-filter: blur(4px);
   border-radius: 20px; padding: 4px 14px; font-size: 12.5px; font-weight: 700;
@@ -64,63 +64,8 @@ header h2 { font-size: clamp(12px, 1.8vw, 15px); font-weight: 500; opacity: 0.9;
 }
 .nav-links a:hover { background: rgba(255,255,255,0.28); }
 
-/* ══ PANTALLA DE LOGIN ══ */
-#loginScreen {
-  display: flex; align-items: center; justify-content: center;
-  min-height: calc(100vh - 160px); padding: 30px 16px;
-}
-.login-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 36px 32px; max-width: 420px; width: 100%;
-  box-shadow: var(--shadow-md); text-align: center;
-}
-.lock-icon {
-  width: 64px; height: 64px; background: #edf4f8; color: var(--primary);
-  border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 18px;
-}
-.lock-icon svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.login-card h2 { font-size: 20px; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
-.login-card p { font-size: 13.5px; color: var(--text-muted); margin-bottom: 24px; }
-.login-field { display: flex; flex-direction: column; gap: 6px; text-align: left; margin-bottom: 18px; }
-.login-field label { font-size: 13px; font-weight: 600; color: var(--text); }
-.pwd-wrap { position: relative; }
-.pwd-wrap input {
-  width: 100%; padding: 11px 42px 11px 13px;
-  border: 1.5px solid var(--border); border-radius: 8px;
-  font-size: 14px; font-family: inherit; transition: border-color 0.2s, box-shadow 0.2s;
-}
-.pwd-wrap input:focus { outline: none; border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(31,111,143,0.12); }
-.pwd-wrap input.shake { animation: shake 0.4s ease; border-color: var(--danger); }
-.toggle-pwd {
-  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-  background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 0;
-  display: flex; align-items: center;
-}
-.toggle-pwd:hover { color: var(--primary); }
-.btn-login {
-  width: 100%; padding: 13px; background: var(--primary); color: #fff;
-  border: none; border-radius: 9px; font-size: 15px; font-weight: 700;
-  font-family: inherit; cursor: pointer; transition: filter 0.2s, transform 0.15s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.btn-login:hover { filter: brightness(1.1); transform: translateY(-1px); }
-.btn-login:active { transform: translateY(0); }
-.login-error {
-  margin-top: 12px; color: var(--danger); font-size: 13px; font-weight: 600;
-  display: none; align-items: center; gap: 6px; justify-content: center;
-}
-.login-error.show { display: flex; }
-.login-hint { margin-top: 16px; font-size: 12px; color: var(--text-muted); }
-
-@keyframes shake {
-  0%,100% { transform: translateX(0); }
-  20%,60% { transform: translateX(-6px); }
-  40%,80% { transform: translateX(6px); }
-}
-
 /* ══ PANEL PRINCIPAL ══ */
-#mainPanel { display: none; padding-bottom: 40px; }
+#mainPanel { padding-bottom: 40px; }
 
 .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 16px 0; }
 
@@ -149,8 +94,6 @@ header h2 { font-size: clamp(12px, 1.8vw, 15px); font-weight: 500; opacity: 0.9;
 .btn-action:hover { filter: brightness(0.94); transform: translateY(-1px); }
 .btn-print { background: var(--primary); color: #fff; }
 .btn-export { background: var(--accent); color: #fff; }
-.btn-logout { background: #e7edf1; color: var(--text); }
-.btn-clear { background: #fee2e2; color: var(--danger); }
 
 /* Stats */
 .stats-grid {
@@ -294,7 +237,7 @@ td.center { text-align: center; }
   body { background: #fff; }
   header { background: none !important; color: #000 !important; border-bottom: 2px solid #123b5d; padding: 4px 0 !important; }
   header h1 { font-size: 16px; color: #123b5d; }
-  #loginScreen, .nav-links, .control-bar button, .tab-group, .filters, .btn-expand, .confirm-overlay { display: none !important; }
+  .nav-links, .control-bar button, .tab-group, .filters, .btn-expand { display: none !important; }
   .wrap { max-width: 100%; padding: 0; }
   .stats-grid { gap: 6px; }
   .stat-card { padding: 8px 10px; }
@@ -319,9 +262,9 @@ td.center { text-align: center; }
       <h2>Hospital Dr. Verdi Cevallos Balda — Panel de Resultados</h2>
     </div>
   </div>
-  <div class="restricted-tag">
-    <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-    ACCESO RESTRINGIDO — ORGANIZADORES Y JURADO
+  <div class="public-tag">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18M4.6 7h14.8M4.6 17h14.8"/></svg>
+    RESULTADOS PÚBLICOS
   </div>
   <div class="nav-links" id="headerNav" style="display:none">
     <a href="index.html">
@@ -338,40 +281,6 @@ td.center { text-align: center; }
     </a>
   </div>
 </header>
-
-<!-- ══ PANTALLA DE LOGIN ══ -->
-<div id="loginScreen">
-  <div class="login-card">
-    <div class="lock-icon">
-      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-    </div>
-    <h2>Acceso restringido</h2>
-    <p>Esta sección es exclusiva para <strong>organizadores y jurado calificador</strong>.<br>Ingrese la contraseña para continuar.</p>
-
-    <div class="login-field">
-      <label for="pwdInput">Contraseña de acceso</label>
-      <div class="pwd-wrap">
-        <input type="password" id="pwdInput" placeholder="Ingrese la contraseña"
-               autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()">
-        <button class="toggle-pwd" type="button" onclick="togglePwd()" aria-label="Mostrar/ocultar contraseña">
-          <svg id="eyeIcon" class="icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <button class="btn-login" onclick="doLogin()">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-      Ingresar al panel
-    </button>
-
-    <div class="login-error" id="loginError">
-      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      Contraseña incorrecta. Intente nuevamente.
-    </div>
-
-    <p class="login-hint">Si no tiene la contraseña, contacte al Comité Científico Organizador.</p>
-  </div>
-</div>
 
 <!-- ══ PANEL PRINCIPAL ══ -->
 <div id="mainPanel">
@@ -404,14 +313,6 @@ td.center { text-align: center; }
       <button class="btn-action btn-export" onclick="exportCSV()">
         <svg class="icon" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="M7 10l5 5 5-5"/><path d="M20 21H4"/></svg>
         Exportar CSV
-      </button>
-      <button class="btn-action btn-clear" onclick="confirmClear()">
-        <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-        Limpiar todo
-      </button>
-      <button class="btn-action btn-logout" onclick="doLogout()">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Cerrar sesión
       </button>
     </div>
 
@@ -467,24 +368,11 @@ td.center { text-align: center; }
   </div><!-- /wrap -->
 </div><!-- /mainPanel -->
 
-<!-- ══ CONFIRM LIMPIAR ══ -->
-<div class="confirm-overlay" id="confirmOverlay">
-  <div class="confirm-box">
-    <h3>¿Eliminar todos los registros?</h3>
-    <p>Esta acción borrará permanentemente <strong>todas las evaluaciones</strong> guardadas (Póster y Ponencia). Esta operación no se puede deshacer.</p>
-    <div class="confirm-btns">
-      <button class="cb-cancel" onclick="closeConfirm()">Cancelar</button>
-      <button class="cb-confirm" onclick="clearAll()">Sí, eliminar todo</button>
-    </div>
-  </div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ══════════════════════════════════════════════════════════════════
-   CONFIGURACIÓN — cambie la contraseña aquí
-══════════════════════════════════════════════════════════════════ */
-const ACCESS_PASSWORD = 'HPVC2026';   // ← contraseña de acceso al panel
-
+const SUPABASE_URL = 'https://qkpctbzhwexxbaqejrag.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrcGN0Ynpod2V4eGJhcWVqcmFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzOTMzNzksImV4cCI6MjEwMzk2OTM3OX0.kAUVMuG4WtqOZcdrvQv_tqMEkZRcWYU-I2d2WoURiWM';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 /* ══════════════════════════════════════════════════════════════════
    CRITERIOS DE REFERENCIA (para mostrar desglose de puntajes)
 ══════════════════════════════════════════════════════════════════ */
@@ -512,52 +400,37 @@ let currentTab = 'todos';
 let expandedRow = null;
 
 /* ══════════════════════════════════════════════════════════════════
-   AUTENTICACIÓN
-══════════════════════════════════════════════════════════════════ */
-function doLogin() {
-  const input = document.getElementById('pwdInput');
-  const error = document.getElementById('loginError');
-
-  if (input.value === ACCESS_PASSWORD) {
-    sessionStorage.setItem('hpvc_auth', '1');
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('mainPanel').style.display = 'block';
-    document.getElementById('headerNav').style.display = 'flex';
-    error.classList.remove('show');
-    renderAll();
-  } else {
-    input.classList.add('shake');
-    error.classList.add('show');
-    input.value = '';
-    setTimeout(() => input.classList.remove('shake'), 450);
-    input.focus();
-  }
-}
-
-function doLogout() {
-  sessionStorage.removeItem('hpvc_auth');
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('mainPanel').style.display = 'none';
-  document.getElementById('headerNav').style.display = 'none';
-  document.getElementById('pwdInput').value = '';
-}
-
-function togglePwd() {
-  const input = document.getElementById('pwdInput');
-  const isText = input.type === 'text';
-  input.type = isText ? 'password' : 'text';
-  document.getElementById('eyeIcon').innerHTML = isText
-    ? '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'
-    : '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
-}
-
-/* ══════════════════════════════════════════════════════════════════
    DATOS
 ══════════════════════════════════════════════════════════════════ */
+let allRecords = [];
+
+async function loadRecords() {
+  const { data, error } = await supabaseClient
+    .from('evaluaciones')
+    .select('id, jurado, categoria, puntaje, puntaje_maximo, criterios, observaciones, fecha_evaluacion, created_at, casos(*)')
+    .order('created_at', { ascending: false });
+  if (error) {
+    alert(`No se pudieron cargar los resultados desde Supabase: ${error.message}`);
+    return;
+  }
+  allRecords = (data || []).map(row => ({
+    ...row.casos,
+    ...(row.casos?.datos || {}),
+    jurado: row.jurado,
+    categoria: row.categoria,
+    puntaje: row.puntaje,
+    maxPuntaje: row.puntaje_maximo,
+    scores: row.criterios,
+    observaciones: row.observaciones,
+    fecha: row.fecha_evaluacion || row.created_at,
+    _dbId: row.id,
+    _createdAt: row.created_at
+  }));
+  renderAll();
+}
+
 function getAllRecords() {
-  const poster   = JSON.parse(localStorage.getItem('evaluaciones_poster')   || '[]');
-  const ponencia = JSON.parse(localStorage.getItem('evaluaciones_ponencia') || '[]');
-  return [...poster, ...ponencia].sort((a, b) => b.puntaje - a.puntaje);
+  return [...allRecords].sort((a, b) => b.puntaje - a.puntaje);
 }
 
 function getFilteredRecords() {
@@ -582,8 +455,8 @@ function getFilteredRecords() {
   const sort = document.getElementById('filterSort')?.value || 'score_desc';
   if (sort === 'score_desc') records.sort((a,b) => b.puntaje - a.puntaje);
   if (sort === 'score_asc')  records.sort((a,b) => a.puntaje - b.puntaje);
-  if (sort === 'date_desc')  records.sort((a,b) => b.id - a.id);
-  if (sort === 'date_asc')   records.sort((a,b) => a.id - b.id);
+  if (sort === 'date_desc')  records.sort((a,b) => new Date(b._createdAt) - new Date(a._createdAt));
+  if (sort === 'date_asc')   records.sort((a,b) => new Date(a._createdAt) - new Date(b._createdAt));
 
   return records;
 }
@@ -797,19 +670,6 @@ function exportCSV() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   LIMPIAR REGISTROS
-══════════════════════════════════════════════════════════════════ */
-function confirmClear() { document.getElementById('confirmOverlay').classList.add('active'); }
-function closeConfirm()  { document.getElementById('confirmOverlay').classList.remove('active'); }
-
-function clearAll() {
-  localStorage.removeItem('evaluaciones_poster');
-  localStorage.removeItem('evaluaciones_ponencia');
-  closeConfirm();
-  renderAll();
-}
-
-/* ══════════════════════════════════════════════════════════════════
    UTILIDADES
 ══════════════════════════════════════════════════════════════════ */
 function esc(str) {
@@ -820,16 +680,10 @@ function esc(str) {
    INICIALIZACIÓN
 ══════════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  // Si ya tiene sesión activa en esta pestaña del navegador, entrar directo
-  if (sessionStorage.getItem('hpvc_auth') === '1') {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('mainPanel').style.display = 'block';
-    document.getElementById('headerNav').style.display = 'flex';
-    renderAll();
-  }
-  document.getElementById('pwdInput').focus();
+  document.getElementById('headerNav').style.display = 'flex';
+  loadRecords();
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeConfirm();
+    if (e.key === 'Escape') document.querySelectorAll('.detail-row.open').forEach(r => r.classList.remove('open'));
   });
 });
 </script>

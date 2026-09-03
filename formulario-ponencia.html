@@ -258,6 +258,7 @@ td input{padding:7px 9px;font-size:13px;border-radius:6px}
         <input id="fechaEval" type="date">
       </div>
     </div>
+    <p class="note" style="margin-top:10px">Los registros guardados no pueden editarse ni eliminarse desde esta aplicación</p>
   </section>
 
   <!-- ══ 2. SELECCIÓN DEL CASO A EVALUAR ══ -->
@@ -449,7 +450,11 @@ td input{padding:7px 9px;font-size:13px;border-radius:6px}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL = 'https://qkpctbzhwexxbaqejrag.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrcGN0Ynpod2V4eGJhcWVqcmFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzOTMzNzksImV4cCI6MjEwMzk2OTM3OX0.kAUVMuG4WtqOZcdrvQv_tqMEkZRcWYU-I2d2WoURiWM';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 /* ══════════════════════════════════════════════════
    CRITERIOS OFICIALES — PONENCIA ORAL (20 pts)
 ══════════════════════════════════════════════════ */
@@ -682,7 +687,7 @@ function resetCaseForm() {
 }
 
 /* ══ GUARDAR TODA LA SESIÓN ══ */
-function guardarTodo() {
+async function guardarTodo() {
   if (!sessionQueue.length) { alert('No hay casos en la lista.'); return; }
 
   const jurado   = document.getElementById('jurado').value.trim();
@@ -696,17 +701,14 @@ function guardarTodo() {
     return;
   }
 
-  const stored = JSON.parse(localStorage.getItem('evaluaciones_ponencia')||'[]');
   const timestamp = new Date();
   const fechaStr = timestamp.toLocaleDateString('es-EC') + ' ' + timestamp.toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'});
 
-  sessionQueue.forEach(r => {
-    stored.push({
-      id: Date.now() + Math.random(),
+  const records = sessionQueue.map(r => ({
       modalidad: 'Ponencia Oral',
       fecha: fecha ? new Date(fecha+'T12:00:00').toLocaleDateString('es-EC') : fechaStr,
       jurado,
-      categoriaJurado: categoria,
+      categoria,
       tipoCaso: r.tipoCaso,
       area: r.area,
       titulo: r.titulo,
@@ -723,10 +725,41 @@ function guardarTodo() {
       puntaje: r.puntaje,
       maxPuntaje: 20,
       observaciones: r.observaciones
-    });
-  });
+    }));
 
-  localStorage.setItem('evaluaciones_ponencia', JSON.stringify(stored));
+  for (const registro of records) {
+    const { data: caso, error: casoError } = await supabaseClient.from('casos').insert({
+      modalidad: registro.modalidad,
+      tipo_caso: registro.tipoCaso,
+      area: registro.area,
+      titulo: registro.titulo,
+      datos: {
+        fecha: registro.fecha,
+        expositor: registro.expositor,
+        identificacion: registro.identificacion,
+        profesion: registro.profesion,
+        institucion: registro.institucion,
+        correo: registro.correo,
+        telefono: registro.telefono,
+        autores: registro.autores,
+        dictamen: registro.dictamen,
+        obsComite: registro.obsComite
+      }
+    }).select('id').single();
+    if (casoError) { alert(`No se pudo guardar el caso en Supabase: ${casoError.message}`); return; }
+
+    const { error } = await supabaseClient.from('evaluaciones').insert({
+      caso_id: caso.id,
+      jurado: registro.jurado,
+      categoria: registro.categoria,
+      puntaje: registro.puntaje,
+      puntaje_maximo: registro.maxPuntaje,
+      criterios: registro.scores,
+      observaciones: registro.observaciones,
+      fecha_evaluacion: fecha || null
+    });
+    if (error) { alert(`No se pudo guardar la evaluación en Supabase: ${error.message}`); return; }
+  }
 
   document.getElementById('modalDesc').innerHTML =
     `Jurado: <strong>${esc(jurado)}</strong><br>
