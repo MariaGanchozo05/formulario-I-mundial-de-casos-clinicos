@@ -67,7 +67,7 @@ header h2 { font-size: clamp(12px, 1.8vw, 15px); font-weight: 500; opacity: 0.9;
 /* ══ PANEL PRINCIPAL ══ */
 #mainPanel { padding-bottom: 40px; }
 
-.wrap { max-width: 1180px; margin: 0 auto; padding: 28px 16px 0; }
+.wrap { max-width: 1360px; margin: 0 auto; padding: 28px 16px 0; }
 
 /* Barra de control */
 .control-bar {
@@ -120,19 +120,32 @@ header h2 { font-size: clamp(12px, 1.8vw, 15px); font-weight: 500; opacity: 0.9;
 .filters select:focus, .filters input:focus { outline: none; border-color: var(--border-focus); }
 .filters label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
 
-/* Tabla de resultados */
-.table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-thead th {
-  background: #edf4f8; color: var(--primary); font-weight: 700;
-  padding: 11px 13px; text-align: left; border-bottom: 1.5px solid var(--border);
-  white-space: nowrap;
+/* Tabla de resultados (estilo hoja de cálculo) */
+.table-wrap {
+  overflow: auto;
+  max-height: min(70vh, 720px);
+  border: 1px solid #c5d0d8;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
 }
-thead th.center { text-align: center; }
-tbody tr { transition: background 0.15s; }
-tbody tr:hover { background: #f8fafc; }
-tbody td { padding: 10px 13px; border-bottom: 1px solid #eef2f5; vertical-align: middle; }
-tbody tr:last-child td { border-bottom: none; }
+.table-wrap > table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table-wrap > table > thead th {
+  position: sticky; top: 0; z-index: 2;
+  background: #eef2f6; color: var(--primary); font-weight: 700;
+  padding: 10px 12px; text-align: left;
+  border: 1px solid #d5dee6; white-space: nowrap;
+}
+.table-wrap > table > thead th.center { text-align: center; }
+.table-wrap > table > tbody > tr > td {
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  vertical-align: middle;
+  background: #fff;
+}
+tbody tr.main-row:nth-child(4n+1) td { background: #fafbfc; }
+tbody tr.main-row:hover td { background: #f1f7fa; }
+tbody tr.main-row.open-parent td { background: #f8fafc; }
 td.center { text-align: center; }
 
 .pos-badge {
@@ -145,11 +158,11 @@ td.center { text-align: center; }
 .pos-n { background: #f4f7f9; color: var(--text-muted); }
 
 .score-chip {
-  display: inline-block; padding: 3px 10px; border-radius: 99px;
-  font-weight: 700; font-size: 13px;
+  display: inline-block; padding: 0; border-radius: 0;
+  font-weight: 700; font-size: 13.5px; background: none;
 }
-.score-poster { background: #e6f4f3; color: var(--accent); }
-.score-ponencia { background: var(--accent2-light); color: var(--accent2); }
+.score-poster { color: var(--accent); }
+.score-ponencia { color: var(--accent2); }
 
 .mod-badge {
   display: inline-block; padding: 3px 9px; border-radius: 6px;
@@ -160,26 +173,6 @@ td.center { text-align: center; }
 
 .jurado-cell { font-size: 12px; color: var(--text-muted); }
 .obs-cell { font-size: 12px; color: #475569; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-/* Detalle expandible */
-.detail-row td { background: #f8fafc; padding: 14px 20px; }
-.detail-row { display: none; }
-.detail-row.open { display: table-row; }
-.detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 10px; }
-.detail-item { font-size: 12.5px; }
-.detail-item .dlabel { font-weight: 700; color: var(--primary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
-.detail-item .dval { color: var(--text); margin-top: 2px; }
-.criteria-mini { margin-top: 10px; }
-.criteria-mini table { font-size: 12px; }
-.criteria-mini th { font-size: 11px; padding: 5px 8px; }
-.criteria-mini td { padding: 5px 8px; }
-
-.btn-expand {
-  background: none; border: none; cursor: pointer; color: var(--primary-light);
-  font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;
-  padding: 3px 8px; border-radius: 5px; transition: background 0.15s;
-}
-.btn-expand:hover { background: #edf4f8; }
 
 /* Sección ranking destacado */
 .ranking-section { margin-bottom: 24px; }
@@ -237,11 +230,12 @@ td.center { text-align: center; }
   body { background: #fff; }
   header { background: none !important; color: #000 !important; border-bottom: 2px solid #123b5d; padding: 4px 0 !important; }
   header h1 { font-size: 16px; color: #123b5d; }
-  .nav-links, .control-bar button, .tab-group, .filters, .btn-expand { display: none !important; }
+  .nav-links, .control-bar button, .tab-group, .filters { display: none !important; }
   .wrap { max-width: 100%; padding: 0; }
   .stats-grid { gap: 6px; }
   .stat-card { padding: 8px 10px; }
   .stat-value { font-size: 20px; }
+  .table-wrap { max-height: none; overflow: visible; }
   table { font-size: 11px; }
   th, td { padding: 5px 7px; }
 }
@@ -333,7 +327,7 @@ td.center { text-align: center; }
         <option>Nutrición</option>
         <option>Otra Especialidad</option>
       </select>
-      <input type="text" id="filterSearch" placeholder="Buscar por título o expositor…" oninput="renderTable()" style="min-width:220px">
+      <input type="text" id="filterSearch" placeholder="Buscar por título…" oninput="renderTable()" style="min-width:220px">
       <select id="filterSort" onchange="renderTable()">
         <option value="score_desc">Mayor puntaje primero</option>
         <option value="score_asc">Menor puntaje primero</option>
@@ -358,7 +352,6 @@ td.center { text-align: center; }
             <th class="center">Puntaje</th>
             <th>Jurado</th>
             <th>Fecha</th>
-            <th class="center">Detalle</th>
           </tr>
         </thead>
         <tbody id="resultsBody"></tbody>
@@ -373,31 +366,11 @@ td.center { text-align: center; }
 const SUPABASE_URL = 'https://qkpctbzhwexxbaqejrag.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_RdXnXo-ubIdSTXGAsu9YaQ_PDMHkHn3';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-/* ══════════════════════════════════════════════════════════════════
-   CRITERIOS DE REFERENCIA (para mostrar desglose de puntajes)
-══════════════════════════════════════════════════════════════════ */
-const CRITERIA_POSTER_NAMES = [
-  "Originalidad e innovación",
-  "Relevancia científica",
-  "Metodología",
-  "Calidad del póster",
-  "Defensa y respuestas"
-];
-const CRITERIA_PONENCIA_NAMES = [
-  "Originalidad",
-  "Complejidad diagnóstica",
-  "Rigor metodológico",
-  "Evidencia científica",
-  "Calidad de la presentación",
-  "Aplicabilidad clínica",
-  "Trabajo interdisciplinario"
-];
 
 /* ══════════════════════════════════════════════════════════════════
    ESTADO
 ══════════════════════════════════════════════════════════════════ */
 let currentTab = 'todos';
-let expandedRow = null;
 
 /* ══════════════════════════════════════════════════════════════════
    DATOS
@@ -407,7 +380,7 @@ let allRecords = [];
 async function loadRecords() {
   const { data, error } = await supabaseClient
     .from('evaluaciones')
-    .select('id, jurado, categoria, puntaje, puntaje_maximo, criterios, observaciones, fecha_evaluacion, created_at, casos(*)')
+    .select('id, jurado_nombre, categoria_jurado, puntaje, max_puntaje, puntajes_criterios, observaciones, fecha_evaluacion, created_at, casos(*)')
     .order('created_at', { ascending: false });
   if (error) {
     alert(`No se pudieron cargar los resultados desde Supabase: ${error.message}`);
@@ -415,12 +388,11 @@ async function loadRecords() {
   }
   allRecords = (data || []).map(row => ({
     ...row.casos,
-    ...(row.casos?.datos || {}),
-    jurado: row.jurado,
-    categoria: row.categoria,
+    jurado: row.jurado_nombre,
+    categoria: row.categoria_jurado,
     puntaje: row.puntaje,
-    maxPuntaje: row.puntaje_maximo,
-    scores: row.criterios,
+    maxPuntaje: row.max_puntaje,
+    scores: row.puntajes_criterios,
     observaciones: row.observaciones,
     fecha: row.fecha_evaluacion || row.created_at,
     _dbId: row.id,
@@ -446,10 +418,7 @@ function getFilteredRecords() {
 
   // búsqueda texto
   const q = (document.getElementById('filterSearch')?.value || '').toLowerCase();
-  if (q) records = records.filter(r =>
-    (r.titulo || '').toLowerCase().includes(q) ||
-    (r.expositor || '').toLowerCase().includes(q)
-  );
+  if (q) records = records.filter(r => (r.titulo || '').toLowerCase().includes(q));
 
   // orden
   const sort = document.getElementById('filterSort')?.value || 'score_desc';
@@ -472,7 +441,6 @@ function renderAll() {
 
 function switchTab(tab) {
   currentTab = tab;
-  expandedRow = null;
   ['todos','poster','ponencia'].forEach(t => {
     document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
   });
@@ -548,7 +516,7 @@ function renderTable() {
 
   if (!records.length) {
     tbody.innerHTML = `
-      <tr><td colspan="10">
+      <tr><td colspan="8">
         <div class="empty-state">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
@@ -567,11 +535,11 @@ function renderTable() {
     const isPoster = r.modalidad === 'Póster Científico';
     const scoreClass = isPoster ? 'score-poster' : 'score-ponencia';
     const modClass   = isPoster ? 'mod-poster'   : 'mod-ponencia';
-    const rid = `det-${r.id}`;
+    const rid = `det-${r._dbId || r.id}`;
     const maxPts = r.maxPuntaje || (isPoster ? 100 : 20);
 
     html += `
-      <tr>
+      <tr class="main-row">
         <td class="center" style="color:var(--text-muted);font-size:12px">${idx+1}</td>
         <td class="center"><span class="pos-badge ${posClass}">${posLabel}</span></td>
         <td><strong>${esc(r.titulo||'Sin título')}</strong></td>
@@ -579,73 +547,11 @@ function renderTable() {
         <td class="center"><span class="mod-badge ${modClass}">${esc(r.modalidad)}</span></td>
         <td class="center"><span class="score-chip ${scoreClass}">${r.puntaje} / ${maxPts}</span></td>
         <td class="jurado-cell">${esc(r.jurado||'—')}</td>
-        <td style="font-size:12px;white-space:nowrap">${esc(r.fecha||'—')}</td>
-        <td class="center">
-          <button class="btn-expand" onclick="toggleDetail('${rid}', this)">
-            <svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-            Ver
-          </button>
-        </td>
-      </tr>
-      <tr class="detail-row" id="${rid}">
-        <td colspan="9">${buildDetail(r)}</td>
+        <td style="font-size:12px;white-space:nowrap">${esc(formatFecha(r.fecha))}</td>
       </tr>`;
   });
 
   tbody.innerHTML = html;
-}
-
-function toggleDetail(rid, btn) {
-  const row = document.getElementById(rid);
-  const isOpen = row.classList.contains('open');
-  // cerrar anterior
-  document.querySelectorAll('.detail-row.open').forEach(r => r.classList.remove('open'));
-  document.querySelectorAll('.btn-expand').forEach(b => {
-    b.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg> Ver';
-  });
-  if (!isOpen) {
-    row.classList.add('open');
-    btn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> Cerrar';
-  }
-}
-
-function buildDetail(r) {
-  const isPoster = r.modalidad === 'Póster Científico';
-  const critNames = isPoster ? CRITERIA_POSTER_NAMES : CRITERIA_PONENCIA_NAMES;
-  const scores = r.scores || {};
-
-  let scoresHtml = '';
-  if (Object.keys(scores).length) {
-    const rows = critNames.map((name, i) =>
-      `<tr><td>${name}</td><td class="center" style="font-weight:700">${scores[i] !== undefined ? scores[i] : '—'}</td></tr>`
-    ).join('');
-    scoresHtml = `
-      <div class="criteria-mini" style="margin-top:12px">
-        <strong style="font-size:12px;color:var(--primary)">Desglose de puntajes por criterio:</strong>
-        <div style="overflow-x:auto;margin-top:6px">
-          <table style="max-width:400px">
-            <thead><tr><th>Criterio</th><th class="center">Pts</th></tr></thead>
-            <tbody>${rows}</tbody>
-          </table>
-        </div>
-      </div>`;
-  }
-
-  const authorsList = (r.autores||[]).map(a => `<span style="margin-right:12px">• ${esc(a.name||'')} <em style="color:var(--text-muted)">(${esc(a.role||'')})</em></span>`).join('');
-
-  return `
-    <div class="detail-grid">
-      <div class="detail-item"><div class="dlabel">Identificación</div><div class="dval">${esc(r.identificacion||'—')}</div></div>
-      <div class="detail-item"><div class="dlabel">Institución</div><div class="dval">${esc(r.institucion||'—')}</div></div>
-      <div class="detail-item"><div class="dlabel">Correo</div><div class="dval">${esc(r.correo||'—')}</div></div>
-      <div class="detail-item"><div class="dlabel">Teléfono</div><div class="dval">${esc(r.telefono||'—')}</div></div>
-      <div class="detail-item"><div class="dlabel">Categoría del Jurado</div><div class="dval">${esc(r.categoria||'—')}</div></div>
-      <div class="detail-item"><div class="dlabel">Dictamen Comité</div><div class="dval">${esc(r.dictamen||'—')}</div></div>
-    </div>
-    ${authorsList ? `<div style="margin-top:10px;font-size:12.5px"><strong style="font-size:11px;color:var(--primary);text-transform:uppercase;letter-spacing:0.4px">Autores:</strong><br>${authorsList}</div>` : ''}
-    ${scoresHtml}
-    ${r.observaciones ? `<div style="margin-top:10px;font-size:12.5px"><strong style="font-size:11px;color:var(--primary);text-transform:uppercase;letter-spacing:0.4px">Observaciones:</strong><br><span style="color:#475569">${esc(r.observaciones)}</span></div>` : ''}
-  `;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -655,13 +561,13 @@ function exportCSV() {
   const records = getFilteredRecords();
   if (!records.length) { alert('No hay registros para exportar.'); return; }
 
-  const headers = ['Posición','Modalidad','Título','Expositor','Profesión','Servicio','Jurado','Dictamen','Puntaje','Puntaje Máximo','Fecha'];
+  const headers = ['Posicion','Titulo del Caso','Servicio','Modalidad','Puntaje','Puntaje Maximo','Jurado','Fecha'];
   const rows = records.map((r, i) => [
-    i+1, r.modalidad, r.titulo, r.expositor, r.profesion, r.area,
-    r.jurado, r.dictamen, r.puntaje, r.maxPuntaje||(r.modalidad==='Póster Científico'?100:20), r.fecha
-  ].map(v => `"${String(v||'').replace(/"/g,'""')}"`));
+    i+1, r.titulo, r.area, r.modalidad,
+    r.puntaje, r.maxPuntaje||(r.modalidad==='Póster Científico'?100:20), r.jurado, formatFecha(r.fecha)
+  ].map(v => `"${String(v ?? '-').replace(/"/g,'""')}"`));
 
-  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const csv = ['sep=;', [headers, ...rows].map(r => r.join(';')).join('\n')].join('\n');
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -676,15 +582,17 @@ function esc(str) {
   return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function formatFecha(f) {
+  if (!f) return '—';
+  return String(f).slice(0, 10);
+}
+
 /* ══════════════════════════════════════════════════════════════════
    INICIALIZACIÓN
 ══════════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('headerNav').style.display = 'flex';
   loadRecords();
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') document.querySelectorAll('.detail-row.open').forEach(r => r.classList.remove('open'));
-  });
 });
 </script>
 </body>
