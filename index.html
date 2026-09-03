@@ -218,20 +218,20 @@ header p {
 }
 
 /* Tarjeta restringida */
-.option-card.restricted::before {
+.option-card.results-card::before {
   background: #4f46e5;
 }
 
-.option-card.restricted:hover {
+.option-card.results-card:hover {
   border-color: #4f46e5;
 }
 
-.restricted-icon {
+.results-icon {
   background: #ede9fe !important;
   color: #4f46e5 !important;
 }
 
-.option-card.restricted .restricted-cta {
+.option-card.results-card .results-cta {
   background: #4f46e5;
   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
   display: inline-flex;
@@ -239,7 +239,7 @@ header p {
   gap: 7px;
 }
 
-.option-card.restricted h2 {
+.option-card.results-card h2 {
   color: #3730a3;
 }
 
@@ -292,16 +292,16 @@ footer {
       </span>
     </a>
 
-    <!-- Panel de Resultados — acceso restringido -->
-    <a class="option-card restricted" href="resultados.html">
-      <div class="icon-wrapper restricted-icon">
-        <svg class="icon-lg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <!-- Panel de Resultados público -->
+    <a class="option-card results-card" href="resultados.html">
+      <div class="icon-wrapper results-icon">
+        <svg class="icon-lg" viewBox="0 0 24 24"><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18M4.6 7h14.8M4.6 17h14.8"/></svg>
       </div>
       <h2>Panel de Resultados</h2>
-      <p>Acceso exclusivo para organizadores y jurado calificador. Requiere contraseña.</p>
-      <span class="cta restricted-cta">
-        <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span>Acceso restringido</span>
+      <p>Consulta pública del ranking, estadísticas, filtros y resultados guardados.</p>
+      <span class="cta results-cta">
+        <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        <span>Ver resultados</span>
         <span>→</span>
       </span>
     </a>

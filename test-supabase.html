@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prueba de conexión Supabase</title>
+<style>
+  :root { color-scheme: light; font-family: system-ui, sans-serif; }
+  body { max-width: 760px; margin: 0 auto; padding: 32px 20px; color: #26343c; background: #f4f7f9; }
+  main { background: #fff; border: 1px solid #d5e0e6; border-radius: 10px; padding: 24px; }
+  h1 { margin-top: 0; color: #123b5d; font-size: 24px; }
+  button { border: 0; border-radius: 6px; padding: 10px 16px; color: #fff; background: #123b5d; font-weight: 700; cursor: pointer; }
+  button:disabled { opacity: .6; cursor: wait; }
+  #status { margin: 20px 0 0; padding: 14px; border-radius: 6px; white-space: pre-wrap; }
+  .pending { background: #edf4f8; }
+  .success { background: #eaf7f0; color: #166534; }
+  .error { background: #fef2f2; color: #991b1b; }
+  table { width: 100%; margin-top: 18px; border-collapse: collapse; }
+  th, td { padding: 9px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+  code { font-size: .9em; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Prueba de conexión a Supabase</h1>
+  <p>Consulta de solo lectura. No crea ni modifica registros.</p>
+  <button id="runTest" type="button">Ejecutar prueba</button>
+  <div id="status" class="pending" role="status" aria-live="polite">Lista para iniciar.</div>
+  <table aria-label="Resultados de la prueba">
+    <thead><tr><th>Comprobación</th><th>Resultado</th><th>Detalle</th></tr></thead>
+    <tbody id="results"></tbody>
+  </table>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://qkpctbzhwexxbaqejrag.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_RdXnXo-ubIdSTXGAsu9YaQ_PDMHkHn3';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const statusElement = document.getElementById('status');
+const resultsElement = document.getElementById('results');
+const button = document.getElementById('runTest');
+
+function addResult(check, passed, detail) {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td>${check}</td><td>${passed ? 'OK' : 'ERROR'}</td><td><code>${detail}</code></td>`;
+  resultsElement.appendChild(row);
+  return passed;
+}
+
+async function testTable(tableName) {
+  const startedAt = performance.now();
+  const { data, error } = await supabaseClient.from(tableName).select('*').limit(1);
+  const duration = Math.round(performance.now() - startedAt);
+  if (error) {
+    addResult(`Tabla ${tableName}`, false, `${error.code || 'sin código'}: ${error.message}`);
+    return false;
+  }
+  return addResult(`Tabla ${tableName}`, true, `${data.length} fila(s) recibida(s) en ${duration} ms`);
+}
+
+async function runTest() {
+  button.disabled = true;
+  resultsElement.replaceChildren();
+  statusElement.className = 'pending';
+  statusElement.textContent = 'Probando conexión y permisos de lectura...';
+  try {
+    const urlIsValid = /^https:\/\/[^/]+\.supabase\.co$/.test(SUPABASE_URL);
+    const keyIsPresent = SUPABASE_ANON_KEY.startsWith('eyJ') || SUPABASE_ANON_KEY.startsWith('sb_publishable_');
+    const configOk = addResult('Configuración del cliente', urlIsValid && keyIsPresent, urlIsValid && keyIsPresent ? 'URL y clave anon presentes' : 'Revisa SUPABASE_URL y SUPABASE_ANON_KEY');
+    const casosOk = await testTable('casos');
+    const evaluacionesOk = await testTable('evaluaciones');
+    const passed = configOk && casosOk && evaluacionesOk;
+    statusElement.className = passed ? 'success' : 'error';
+    statusElement.textContent = passed ? 'Prueba superada: Supabase responde y las dos tablas son accesibles.' : 'Prueba fallida: revisa el detalle de la tabla con error, las políticas RLS y que el esquema esté aplicado.';
+  } catch (error) {
+    statusElement.className = 'error';
+    statusElement.textContent = `Error inesperado: ${error.message}`;
+    addResult('Ejecución de la prueba', false, error.message);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+button.addEventListener('click', runTest);
+</script>
+</body>
+</html>
