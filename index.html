@@ -110,8 +110,11 @@ header p {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
+  justify-content: center;
+  max-width: 1040px;
+  margin: 0 auto;
 }
 
 .option-card {
@@ -214,6 +217,32 @@ header p {
   filter: brightness(0.95);
 }
 
+/* Tarjeta restringida */
+.option-card.restricted::before {
+  background: #4f46e5;
+}
+
+.option-card.restricted:hover {
+  border-color: #4f46e5;
+}
+
+.restricted-icon {
+  background: #ede9fe !important;
+  color: #4f46e5 !important;
+}
+
+.option-card.restricted .restricted-cta {
+  background: #4f46e5;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.option-card.restricted h2 {
+  color: #3730a3;
+}
+
 footer {
   text-align: center;
   color: var(--text-muted);
@@ -237,32 +266,42 @@ footer {
   <p class="intro">Bienvenido al portal del evento científico. Seleccione el módulo al que desea ingresar:</p>
 
   <div class="cards-grid">
-    <!-- Opción 1: Formulario de Inscripción -->
-    <a class="option-card" href="preview (5).html">
-      <div class="icon-wrapper"><svg class="icon-lg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
-      <h2>Formulario de Inscripción</h2>
+    <!-- Formulario Póster Científico -->
+    <a class="option-card" href="formulario-poster.html">
+      <div class="icon-wrapper">
+        <svg class="icon-lg" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      </div>
+      <h2>Evaluación de Póster Científico</h2>
+      <p>Formulario de calificación para la modalidad de Póster Científico. Puntaje máximo: 100 puntos.</p>
       <span class="cta">
         <span>Ingresar al Formulario</span>
         <span>→</span>
       </span>
     </a>
 
-    <!-- Opción 2: Sistema de Evaluación del Jurado -->
-    <a class="option-card alt" href="preview (6).html">
-      <div class="icon-wrapper"><svg class="icon-lg" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></div>
-      <h2>Sistema de Evaluación y Ranking</h2>
+    <!-- Formulario Ponencia Oral -->
+    <a class="option-card alt" href="formulario-ponencia.html">
+      <div class="icon-wrapper">
+        <svg class="icon-lg" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      </div>
+      <h2>Evaluación de Ponencia Oral</h2>
+      <p>Formulario de calificación para la modalidad de Ponencia Oral. Puntaje máximo: 20 puntos.</p>
       <span class="cta">
-        <span>Ingresar a Evaluación</span>
+        <span>Ingresar al Formulario</span>
         <span>→</span>
       </span>
     </a>
 
-    <!-- Opción 3: Registros Guardados -->
-    <a class="option-card" href="registros.html">
-      <div class="icon-wrapper"><svg class="icon-lg" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><line x1="9" y1="12" x2="15" y2="12"></line><line x1="9" y1="16" x2="15" y2="16"></line></svg></div>
-      <h2>Registros Guardados</h2>
-      <span class="cta">
-        <span>Ver Registros</span>
+    <!-- Panel de Resultados — acceso restringido -->
+    <a class="option-card restricted" href="resultados.html">
+      <div class="icon-wrapper restricted-icon">
+        <svg class="icon-lg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h2>Panel de Resultados</h2>
+      <p>Acceso exclusivo para organizadores y jurado calificador. Requiere contraseña.</p>
+      <span class="cta restricted-cta">
+        <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>Acceso restringido</span>
         <span>→</span>
       </span>
     </a>

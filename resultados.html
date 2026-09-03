@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Resultados — I Mundial de Casos Clínicos HPVC 2026</title>
+<link rel="icon" href="escudo-msp.jpg" type="image/jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #123b5d;
+  --primary-light: #1f6f8f;
+  --accent: #0b7a75;
+  --accent-light: #e6f4f3;
+  --accent2: #7c3aed;
+  --accent2-light: #ede9fe;
+  --bg: #f4f7f9;
+  --surface: #ffffff;
+  --border: #d5e0e6;
+  --border-focus: #1f6f8f;
+  --text: #26343c;
+  --text-muted: #64748b;
+  --danger: #b42318;
+  --success: #16794c;
+  --success-bg: #eaf7f0;
+  --gold: #b7791f;
+  --silver: #64748b;
+  --bronze: #92400e;
+  --shadow-sm: 0 2px 8px rgba(18,59,93,0.06);
+  --shadow-md: 0 8px 28px rgba(18,59,93,0.10);
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
+
+.icon { width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+body { background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh; }
+
+/* ══ HEADER ══ */
+header {
+  background: linear-gradient(135deg, rgba(18,59,93,0.95), rgba(31,111,143,0.92)), url('BACKGROUND.jpg') center/cover no-repeat;
+  color: #fff; padding: 26px 20px 20px; text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.header-brand { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 8px; }
+.header-brand img { width: 52px; height: 52px; border-radius: 50%; background: #fff; padding: 2px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+header h1 { font-size: clamp(17px, 3vw, 26px); font-weight: 800; letter-spacing: -0.4px; }
+header h2 { font-size: clamp(12px, 1.8vw, 15px); font-weight: 500; opacity: 0.9; margin-top: 2px; }
+.restricted-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.18); backdrop-filter: blur(4px);
+  border-radius: 20px; padding: 4px 14px; font-size: 12.5px; font-weight: 700;
+  margin-top: 10px; letter-spacing: 0.3px;
+}
+.nav-links { margin-top: 12px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.nav-links a {
+  color: #fff; text-decoration: none; font-size: 13px; font-weight: 600;
+  padding: 5px 12px; border-radius: 6px; background: rgba(255,255,255,0.15);
+  display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;
+}
+.nav-links a:hover { background: rgba(255,255,255,0.28); }
+
+/* ══ PANTALLA DE LOGIN ══ */
+#loginScreen {
+  display: flex; align-items: center; justify-content: center;
+  min-height: calc(100vh - 160px); padding: 30px 16px;
+}
+.login-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 36px 32px; max-width: 420px; width: 100%;
+  box-shadow: var(--shadow-md); text-align: center;
+}
+.lock-icon {
+  width: 64px; height: 64px; background: #edf4f8; color: var(--primary);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 18px;
+}
+.lock-icon svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.login-card h2 { font-size: 20px; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
+.login-card p { font-size: 13.5px; color: var(--text-muted); margin-bottom: 24px; }
+.login-field { display: flex; flex-direction: column; gap: 6px; text-align: left; margin-bottom: 18px; }
+.login-field label { font-size: 13px; font-weight: 600; color: var(--text); }
+.pwd-wrap { position: relative; }
+.pwd-wrap input {
+  width: 100%; padding: 11px 42px 11px 13px;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 14px; font-family: inherit; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.pwd-wrap input:focus { outline: none; border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(31,111,143,0.12); }
+.pwd-wrap input.shake { animation: shake 0.4s ease; border-color: var(--danger); }
+.toggle-pwd {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 0;
+  display: flex; align-items: center;
+}
+.toggle-pwd:hover { color: var(--primary); }
+.btn-login {
+  width: 100%; padding: 13px; background: var(--primary); color: #fff;
+  border: none; border-radius: 9px; font-size: 15px; font-weight: 700;
+  font-family: inherit; cursor: pointer; transition: filter 0.2s, transform 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-login:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.btn-login:active { transform: translateY(0); }
+.login-error {
+  margin-top: 12px; color: var(--danger); font-size: 13px; font-weight: 600;
+  display: none; align-items: center; gap: 6px; justify-content: center;
+}
+.login-error.show { display: flex; }
+.login-hint { margin-top: 16px; font-size: 12px; color: var(--text-muted); }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%,60% { transform: translateX(-6px); }
+  40%,80% { transform: translateX(6px); }
+}
+
+/* ══ PANEL PRINCIPAL ══ */
+#mainPanel { display: none; padding-bottom: 40px; }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 28px 16px 0; }
+
+/* Barra de control */
+.control-bar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 20px; margin-bottom: 22px;
+  box-shadow: var(--shadow-sm);
+}
+.control-bar h2 { font-size: 17px; font-weight: 700; color: var(--primary); flex: 1; }
+.tab-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab {
+  padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700;
+  border: 1.5px solid var(--border); background: #f4f7f9; color: var(--text-muted);
+  cursor: pointer; transition: all 0.18s; display: inline-flex; align-items: center; gap: 6px;
+}
+.tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.tab:hover:not(.active) { border-color: var(--primary-light); color: var(--primary); background: #edf4f8; }
+
+.btn-action {
+  font-family: inherit; font-size: 13px; font-weight: 700; border: none;
+  border-radius: 8px; padding: 9px 16px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 7px; transition: filter 0.15s, transform 0.15s;
+}
+.btn-action:hover { filter: brightness(0.94); transform: translateY(-1px); }
+.btn-print { background: var(--primary); color: #fff; }
+.btn-export { background: var(--accent); color: #fff; }
+.btn-logout { background: #e7edf1; color: var(--text); }
+.btn-clear { background: #fee2e2; color: var(--danger); }
+
+/* Stats */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 14px;
+  margin-bottom: 22px;
+}
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px 18px; box-shadow: var(--shadow-sm);
+}
+.stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 28px; font-weight: 800; color: var(--primary); margin-top: 4px; }
+.stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* Filtros */
+.filters {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; align-items: center;
+}
+.filters select, .filters input {
+  font-family: inherit; padding: 8px 12px; border: 1.5px solid var(--border);
+  border-radius: 8px; font-size: 13px; background: #fff; color: var(--text);
+  transition: border-color 0.2s;
+}
+.filters select:focus, .filters input:focus { outline: none; border-color: var(--border-focus); }
+.filters label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+
+/* Tabla de resultados */
+.table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+thead th {
+  background: #edf4f8; color: var(--primary); font-weight: 700;
+  padding: 11px 13px; text-align: left; border-bottom: 1.5px solid var(--border);
+  white-space: nowrap;
+}
+thead th.center { text-align: center; }
+tbody tr { transition: background 0.15s; }
+tbody tr:hover { background: #f8fafc; }
+tbody td { padding: 10px 13px; border-bottom: 1px solid #eef2f5; vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+td.center { text-align: center; }
+
+.pos-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 50%; font-weight: 800; font-size: 13px;
+}
+.pos-1 { background: #fef3c7; color: var(--gold); }
+.pos-2 { background: #f1f5f9; color: var(--silver); }
+.pos-3 { background: #fef3c7; color: var(--bronze); }
+.pos-n { background: #f4f7f9; color: var(--text-muted); }
+
+.score-chip {
+  display: inline-block; padding: 3px 10px; border-radius: 99px;
+  font-weight: 700; font-size: 13px;
+}
+.score-poster { background: #e6f4f3; color: var(--accent); }
+.score-ponencia { background: var(--accent2-light); color: var(--accent2); }
+
+.mod-badge {
+  display: inline-block; padding: 3px 9px; border-radius: 6px;
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.2px;
+}
+.mod-poster   { background: #e6f4f3; color: var(--accent); }
+.mod-ponencia { background: var(--accent2-light); color: var(--accent2); }
+
+.jurado-cell { font-size: 12px; color: var(--text-muted); }
+.obs-cell { font-size: 12px; color: #475569; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Detalle expandible */
+.detail-row td { background: #f8fafc; padding: 14px 20px; }
+.detail-row { display: none; }
+.detail-row.open { display: table-row; }
+.detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 10px; }
+.detail-item { font-size: 12.5px; }
+.detail-item .dlabel { font-weight: 700; color: var(--primary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
+.detail-item .dval { color: var(--text); margin-top: 2px; }
+.criteria-mini { margin-top: 10px; }
+.criteria-mini table { font-size: 12px; }
+.criteria-mini th { font-size: 11px; padding: 5px 8px; }
+.criteria-mini td { padding: 5px 8px; }
+
+.btn-expand {
+  background: none; border: none; cursor: pointer; color: var(--primary-light);
+  font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 5px; transition: background 0.15s;
+}
+.btn-expand:hover { background: #edf4f8; }
+
+/* Sección ranking destacado */
+.ranking-section { margin-bottom: 24px; }
+.ranking-section h3 {
+  font-size: 15px; font-weight: 700; color: var(--primary);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.podium-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 14px; margin-bottom: 20px; }
+.podium-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px 18px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+}
+.podium-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
+.podium-card.gold::before   { background: #f59e0b; }
+.podium-card.silver::before { background: #94a3b8; }
+.podium-card.bronze::before { background: #b45309; }
+.podium-pos { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.podium-card.gold   .podium-pos { color: var(--gold); }
+.podium-card.silver .podium-pos { color: var(--silver); }
+.podium-card.bronze .podium-pos { color: var(--bronze); }
+.podium-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 3px; line-height: 1.3; }
+.podium-meta  { font-size: 12px; color: var(--text-muted); }
+.podium-score { font-size: 22px; font-weight: 800; margin-top: 8px; }
+.podium-card.gold   .podium-score { color: var(--gold); }
+.podium-card.silver .podium-score { color: var(--silver); }
+.podium-card.bronze .podium-score { color: var(--bronze); }
+
+/* Vacío */
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); }
+.empty-state svg { width: 48px; height: 48px; margin: 0 auto 12px; display: block; opacity: 0.35; }
+.empty-state p { font-size: 14px; }
+
+/* Confirm overlay */
+.confirm-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(18,59,93,0.5); backdrop-filter: blur(4px);
+  z-index: 9999; align-items: center; justify-content: center; padding: 20px;
+}
+.confirm-overlay.active { display: flex; }
+.confirm-box {
+  background: #fff; border-radius: 14px; max-width: 420px; width: 100%;
+  padding: 28px 24px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+  animation: scaleIn 0.22s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes scaleIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
+.confirm-box h3 { font-size: 18px; font-weight: 800; color: var(--danger); margin-bottom: 10px; }
+.confirm-box p  { font-size: 13.5px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.5; }
+.confirm-btns { display: flex; gap: 10px; justify-content: center; }
+.cb-cancel  { background: #e7edf1; color: var(--text); border: none; font-family: inherit; font-weight: 700; border-radius: 9px; padding: 11px 22px; cursor: pointer; font-size: 14px; }
+.cb-confirm { background: var(--danger); color: #fff; border: none; font-family: inherit; font-weight: 700; border-radius: 9px; padding: 11px 22px; cursor: pointer; font-size: 14px; }
+
+/* Print */
+@media print {
+  @page { size: A4 landscape; margin: 10mm; }
+  body { background: #fff; }
+  header { background: none !important; color: #000 !important; border-bottom: 2px solid #123b5d; padding: 4px 0 !important; }
+  header h1 { font-size: 16px; color: #123b5d; }
+  #loginScreen, .nav-links, .control-bar button, .tab-group, .filters, .btn-expand, .confirm-overlay { display: none !important; }
+  .wrap { max-width: 100%; padding: 0; }
+  .stats-grid { gap: 6px; }
+  .stat-card { padding: 8px 10px; }
+  .stat-value { font-size: 20px; }
+  table { font-size: 11px; }
+  th, td { padding: 5px 7px; }
+}
+
+@media (max-width: 700px) {
+  .control-bar { flex-direction: column; align-items: flex-start; }
+  .podium-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <img src="escudo-msp.jpg" alt="Escudo MSP">
+    <div>
+      <h1>I MUNDIAL DE CASOS CLÍNICOS HPVC 2026</h1>
+      <h2>Hospital Dr. Verdi Cevallos Balda — Panel de Resultados</h2>
+    </div>
+  </div>
+  <div class="restricted-tag">
+    <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    ACCESO RESTRINGIDO — ORGANIZADORES Y JURADO
+  </div>
+  <div class="nav-links" id="headerNav" style="display:none">
+    <a href="index.html">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Inicio
+    </a>
+    <a href="formulario-poster.html">
+      <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Formulario Póster
+    </a>
+    <a href="formulario-ponencia.html">
+      <svg class="icon" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      Formulario Ponencia
+    </a>
+  </div>
+</header>
+
+<!-- ══ PANTALLA DE LOGIN ══ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="lock-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <h2>Acceso restringido</h2>
+    <p>Esta sección es exclusiva para <strong>organizadores y jurado calificador</strong>.<br>Ingrese la contraseña para continuar.</p>
+
+    <div class="login-field">
+      <label for="pwdInput">Contraseña de acceso</label>
+      <div class="pwd-wrap">
+        <input type="password" id="pwdInput" placeholder="Ingrese la contraseña"
+               autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()">
+        <button class="toggle-pwd" type="button" onclick="togglePwd()" aria-label="Mostrar/ocultar contraseña">
+          <svg id="eyeIcon" class="icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <button class="btn-login" onclick="doLogin()">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      Ingresar al panel
+    </button>
+
+    <div class="login-error" id="loginError">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Contraseña incorrecta. Intente nuevamente.
+    </div>
+
+    <p class="login-hint">Si no tiene la contraseña, contacte al Comité Científico Organizador.</p>
+  </div>
+</div>
+
+<!-- ══ PANEL PRINCIPAL ══ -->
+<div id="mainPanel">
+  <div class="wrap">
+
+    <!-- Barra de control -->
+    <div class="control-bar">
+      <h2>
+        <svg class="icon" viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Resultados Oficiales
+      </h2>
+      <div class="tab-group">
+        <button class="tab active" onclick="switchTab('todos')" id="tab-todos">
+          <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Todos
+        </button>
+        <button class="tab" onclick="switchTab('poster')" id="tab-poster">
+          <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Póster
+        </button>
+        <button class="tab" onclick="switchTab('ponencia')" id="tab-ponencia">
+          <svg class="icon" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          Ponencia
+        </button>
+      </div>
+      <button class="btn-action btn-print" onclick="window.print()">
+        <svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Imprimir
+      </button>
+      <button class="btn-action btn-export" onclick="exportCSV()">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="M7 10l5 5 5-5"/><path d="M20 21H4"/></svg>
+        Exportar CSV
+      </button>
+      <button class="btn-action btn-clear" onclick="confirmClear()">
+        <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        Limpiar todo
+      </button>
+      <button class="btn-action btn-logout" onclick="doLogout()">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Cerrar sesión
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <!-- Filtros -->
+    <div class="filters">
+      <label>Filtrar por:</label>
+      <select id="filterArea" onchange="renderTable()">
+        <option value="">Todos los servicios</option>
+        <option>Cirugía</option>
+        <option>Medicina Interna</option>
+        <option>Ginecología y Obstetricia</option>
+        <option>Pediatría</option>
+        <option>Neonatología</option>
+        <option>Enfermería</option>
+        <option>Nutrición</option>
+        <option>Otra Especialidad</option>
+      </select>
+      <input type="text" id="filterSearch" placeholder="Buscar por título o expositor…" oninput="renderTable()" style="min-width:220px">
+      <select id="filterSort" onchange="renderTable()">
+        <option value="score_desc">Mayor puntaje primero</option>
+        <option value="score_asc">Menor puntaje primero</option>
+        <option value="date_desc">Más reciente primero</option>
+        <option value="date_asc">Más antiguo primero</option>
+      </select>
+    </div>
+
+    <!-- Podio (solo top 3 de la pestaña activa) -->
+    <div class="ranking-section" id="podiumSection"></div>
+
+    <!-- Tabla -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="center" style="width:46px">#</th>
+            <th class="center" style="width:56px">Pos.</th>
+            <th>Título del Caso</th>
+            <th>Servicio</th>
+            <th class="center">Modalidad</th>
+            <th class="center">Puntaje</th>
+            <th>Jurado</th>
+            <th>Fecha</th>
+            <th class="center">Detalle</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+  </div><!-- /wrap -->
+</div><!-- /mainPanel -->
+
+<!-- ══ CONFIRM LIMPIAR ══ -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h3>¿Eliminar todos los registros?</h3>
+    <p>Esta acción borrará permanentemente <strong>todas las evaluaciones</strong> guardadas (Póster y Ponencia). Esta operación no se puede deshacer.</p>
+    <div class="confirm-btns">
+      <button class="cb-cancel" onclick="closeConfirm()">Cancelar</button>
+      <button class="cb-confirm" onclick="clearAll()">Sí, eliminar todo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   CONFIGURACIÓN — cambie la contraseña aquí
+══════════════════════════════════════════════════════════════════ */
+const ACCESS_PASSWORD = 'HPVC2026';   // ← contraseña de acceso al panel
+
+/* ══════════════════════════════════════════════════════════════════
+   CRITERIOS DE REFERENCIA (para mostrar desglose de puntajes)
+══════════════════════════════════════════════════════════════════ */
+const CRITERIA_POSTER_NAMES = [
+  "Originalidad e innovación",
+  "Relevancia científica",
+  "Metodología",
+  "Calidad del póster",
+  "Defensa y respuestas"
+];
+const CRITERIA_PONENCIA_NAMES = [
+  "Originalidad",
+  "Complejidad diagnóstica",
+  "Rigor metodológico",
+  "Evidencia científica",
+  "Calidad de la presentación",
+  "Aplicabilidad clínica",
+  "Trabajo interdisciplinario"
+];
+
+/* ══════════════════════════════════════════════════════════════════
+   ESTADO
+══════════════════════════════════════════════════════════════════ */
+let currentTab = 'todos';
+let expandedRow = null;
+
+/* ══════════════════════════════════════════════════════════════════
+   AUTENTICACIÓN
+══════════════════════════════════════════════════════════════════ */
+function doLogin() {
+  const input = document.getElementById('pwdInput');
+  const error = document.getElementById('loginError');
+
+  if (input.value === ACCESS_PASSWORD) {
+    sessionStorage.setItem('hpvc_auth', '1');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainPanel').style.display = 'block';
+    document.getElementById('headerNav').style.display = 'flex';
+    error.classList.remove('show');
+    renderAll();
+  } else {
+    input.classList.add('shake');
+    error.classList.add('show');
+    input.value = '';
+    setTimeout(() => input.classList.remove('shake'), 450);
+    input.focus();
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('hpvc_auth');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('mainPanel').style.display = 'none';
+  document.getElementById('headerNav').style.display = 'none';
+  document.getElementById('pwdInput').value = '';
+}
+
+function togglePwd() {
+  const input = document.getElementById('pwdInput');
+  const isText = input.type === 'text';
+  input.type = isText ? 'password' : 'text';
+  document.getElementById('eyeIcon').innerHTML = isText
+    ? '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'
+    : '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   DATOS
+══════════════════════════════════════════════════════════════════ */
+function getAllRecords() {
+  const poster   = JSON.parse(localStorage.getItem('evaluaciones_poster')   || '[]');
+  const ponencia = JSON.parse(localStorage.getItem('evaluaciones_ponencia') || '[]');
+  return [...poster, ...ponencia].sort((a, b) => b.puntaje - a.puntaje);
+}
+
+function getFilteredRecords() {
+  let records = getAllRecords();
+
+  // filtro pestaña
+  if (currentTab === 'poster')   records = records.filter(r => r.modalidad === 'Póster Científico');
+  if (currentTab === 'ponencia') records = records.filter(r => r.modalidad === 'Ponencia Oral');
+
+  // filtro área
+  const area = document.getElementById('filterArea')?.value;
+  if (area) records = records.filter(r => r.area === area);
+
+  // búsqueda texto
+  const q = (document.getElementById('filterSearch')?.value || '').toLowerCase();
+  if (q) records = records.filter(r =>
+    (r.titulo || '').toLowerCase().includes(q) ||
+    (r.expositor || '').toLowerCase().includes(q)
+  );
+
+  // orden
+  const sort = document.getElementById('filterSort')?.value || 'score_desc';
+  if (sort === 'score_desc') records.sort((a,b) => b.puntaje - a.puntaje);
+  if (sort === 'score_asc')  records.sort((a,b) => a.puntaje - b.puntaje);
+  if (sort === 'date_desc')  records.sort((a,b) => b.id - a.id);
+  if (sort === 'date_asc')   records.sort((a,b) => a.id - b.id);
+
+  return records;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RENDER PRINCIPAL
+══════════════════════════════════════════════════════════════════ */
+function renderAll() {
+  renderStats();
+  renderPodium();
+  renderTable();
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  expandedRow = null;
+  ['todos','poster','ponencia'].forEach(t => {
+    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+  });
+  renderAll();
+}
+
+/* ── Stats ── */
+function renderStats() {
+  const all      = getAllRecords();
+  const posters  = all.filter(r => r.modalidad === 'Póster Científico');
+  const ponencias= all.filter(r => r.modalidad === 'Ponencia Oral');
+  const avgPoster  = posters.length  ? (posters.reduce((s,r)=>s+r.puntaje,0)/posters.length).toFixed(1) : '—';
+  const avgPonencia= ponencias.length? (ponencias.reduce((s,r)=>s+r.puntaje,0)/ponencias.length).toFixed(1): '—';
+  const topPoster  = posters.length  ? Math.max(...posters.map(r=>r.puntaje))  : '—';
+  const topPonencia= ponencias.length? Math.max(...ponencias.map(r=>r.puntaje)): '—';
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Total evaluaciones</div>
+      <div class="stat-value">${all.length}</div>
+      <div class="stat-sub">${posters.length} póster · ${ponencias.length} ponencia</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Póster — prom. / máx.</div>
+      <div class="stat-value" style="color:var(--accent)">${avgPoster}</div>
+      <div class="stat-sub">Máximo registrado: ${topPoster} / 100</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ponencia — prom. / máx.</div>
+      <div class="stat-value" style="color:var(--accent2)">${avgPonencia}</div>
+      <div class="stat-sub">Máximo registrado: ${topPonencia} / 20</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Servicios con evaluación</div>
+      <div class="stat-value">${new Set(all.map(r=>r.area).filter(Boolean)).size}</div>
+      <div class="stat-sub">de 5 servicios registrados</div>
+    </div>
+  `;
+}
+
+/* ── Podio ── */
+function renderPodium() {
+  const records = getFilteredRecords().slice(0, 3);
+  const classes = ['gold','silver','bronze'];
+  const labels  = ['🥇 1.er Lugar','🥈 2.º Lugar','🥉 3.er Lugar'];
+  const section = document.getElementById('podiumSection');
+
+  if (!records.length) { section.innerHTML = ''; return; }
+
+  section.innerHTML = `
+    <h3>
+      <svg class="icon" style="width:18px;height:18px" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Tabla de Posiciones${currentTab!=='todos'?' — '+(currentTab==='poster'?'Póster Científico':'Ponencia Oral'):''}
+    </h3>
+    <div class="podium-grid">
+      ${records.map((r,i) => `
+        <div class="podium-card ${classes[i]}">
+          <div class="podium-pos">${labels[i]}</div>
+          <div class="podium-title">${esc(r.titulo || 'Sin título')}</div>
+          <div class="podium-meta">${esc(r.area||'—')}</div>
+          <div class="podium-score">${r.puntaje} <span style="font-size:14px;font-weight:600;opacity:0.6">/ ${r.maxPuntaje||'—'} pts</span></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+/* ── Tabla ── */
+function renderTable() {
+  renderPodium();
+  const records = getFilteredRecords();
+  const tbody = document.getElementById('resultsBody');
+
+  if (!records.length) {
+    tbody.innerHTML = `
+      <tr><td colspan="10">
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <p>No hay evaluaciones registradas${currentTab!=='todos'?' para esta modalidad':''}.</p>
+        </div>
+      </td></tr>`;
+    return;
+  }
+
+  let html = '';
+  records.forEach((r, idx) => {
+    const pos = idx + 1;
+    const posClass = pos===1?'pos-1':pos===2?'pos-2':pos===3?'pos-3':'pos-n';
+    const posLabel = pos<=3?`${pos}.º`:`${pos}`;
+    const isPoster = r.modalidad === 'Póster Científico';
+    const scoreClass = isPoster ? 'score-poster' : 'score-ponencia';
+    const modClass   = isPoster ? 'mod-poster'   : 'mod-ponencia';
+    const rid = `det-${r.id}`;
+    const maxPts = r.maxPuntaje || (isPoster ? 100 : 20);
+
+    html += `
+      <tr>
+        <td class="center" style="color:var(--text-muted);font-size:12px">${idx+1}</td>
+        <td class="center"><span class="pos-badge ${posClass}">${posLabel}</span></td>
+        <td><strong>${esc(r.titulo||'Sin título')}</strong></td>
+        <td>${esc(r.area||'—')}</td>
+        <td class="center"><span class="mod-badge ${modClass}">${esc(r.modalidad)}</span></td>
+        <td class="center"><span class="score-chip ${scoreClass}">${r.puntaje} / ${maxPts}</span></td>
+        <td class="jurado-cell">${esc(r.jurado||'—')}</td>
+        <td style="font-size:12px;white-space:nowrap">${esc(r.fecha||'—')}</td>
+        <td class="center">
+          <button class="btn-expand" onclick="toggleDetail('${rid}', this)">
+            <svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            Ver
+          </button>
+        </td>
+      </tr>
+      <tr class="detail-row" id="${rid}">
+        <td colspan="9">${buildDetail(r)}</td>
+      </tr>`;
+  });
+
+  tbody.innerHTML = html;
+}
+
+function toggleDetail(rid, btn) {
+  const row = document.getElementById(rid);
+  const isOpen = row.classList.contains('open');
+  // cerrar anterior
+  document.querySelectorAll('.detail-row.open').forEach(r => r.classList.remove('open'));
+  document.querySelectorAll('.btn-expand').forEach(b => {
+    b.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg> Ver';
+  });
+  if (!isOpen) {
+    row.classList.add('open');
+    btn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> Cerrar';
+  }
+}
+
+function buildDetail(r) {
+  const isPoster = r.modalidad === 'Póster Científico';
+  const critNames = isPoster ? CRITERIA_POSTER_NAMES : CRITERIA_PONENCIA_NAMES;
+  const scores = r.scores || {};
+
+  let scoresHtml = '';
+  if (Object.keys(scores).length) {
+    const rows = critNames.map((name, i) =>
+      `<tr><td>${name}</td><td class="center" style="font-weight:700">${scores[i] !== undefined ? scores[i] : '—'}</td></tr>`
+    ).join('');
+    scoresHtml = `
+      <div class="criteria-mini" style="margin-top:12px">
+        <strong style="font-size:12px;color:var(--primary)">Desglose de puntajes por criterio:</strong>
+        <div style="overflow-x:auto;margin-top:6px">
+          <table style="max-width:400px">
+            <thead><tr><th>Criterio</th><th class="center">Pts</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>`;
+  }
+
+  const authorsList = (r.autores||[]).map(a => `<span style="margin-right:12px">• ${esc(a.name||'')} <em style="color:var(--text-muted)">(${esc(a.role||'')})</em></span>`).join('');
+
+  return `
+    <div class="detail-grid">
+      <div class="detail-item"><div class="dlabel">Identificación</div><div class="dval">${esc(r.identificacion||'—')}</div></div>
+      <div class="detail-item"><div class="dlabel">Institución</div><div class="dval">${esc(r.institucion||'—')}</div></div>
+      <div class="detail-item"><div class="dlabel">Correo</div><div class="dval">${esc(r.correo||'—')}</div></div>
+      <div class="detail-item"><div class="dlabel">Teléfono</div><div class="dval">${esc(r.telefono||'—')}</div></div>
+      <div class="detail-item"><div class="dlabel">Categoría del Jurado</div><div class="dval">${esc(r.categoria||'—')}</div></div>
+      <div class="detail-item"><div class="dlabel">Dictamen Comité</div><div class="dval">${esc(r.dictamen||'—')}</div></div>
+    </div>
+    ${authorsList ? `<div style="margin-top:10px;font-size:12.5px"><strong style="font-size:11px;color:var(--primary);text-transform:uppercase;letter-spacing:0.4px">Autores:</strong><br>${authorsList}</div>` : ''}
+    ${scoresHtml}
+    ${r.observaciones ? `<div style="margin-top:10px;font-size:12.5px"><strong style="font-size:11px;color:var(--primary);text-transform:uppercase;letter-spacing:0.4px">Observaciones:</strong><br><span style="color:#475569">${esc(r.observaciones)}</span></div>` : ''}
+  `;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   EXPORTAR CSV
+══════════════════════════════════════════════════════════════════ */
+function exportCSV() {
+  const records = getFilteredRecords();
+  if (!records.length) { alert('No hay registros para exportar.'); return; }
+
+  const headers = ['Posición','Modalidad','Título','Expositor','Profesión','Servicio','Jurado','Dictamen','Puntaje','Puntaje Máximo','Fecha'];
+  const rows = records.map((r, i) => [
+    i+1, r.modalidad, r.titulo, r.expositor, r.profesion, r.area,
+    r.jurado, r.dictamen, r.puntaje, r.maxPuntaje||(r.modalidad==='Póster Científico'?100:20), r.fecha
+  ].map(v => `"${String(v||'').replace(/"/g,'""')}"`));
+
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `Resultados_HPVC2026_${Date.now()}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LIMPIAR REGISTROS
+══════════════════════════════════════════════════════════════════ */
+function confirmClear() { document.getElementById('confirmOverlay').classList.add('active'); }
+function closeConfirm()  { document.getElementById('confirmOverlay').classList.remove('active'); }
+
+function clearAll() {
+  localStorage.removeItem('evaluaciones_poster');
+  localStorage.removeItem('evaluaciones_ponencia');
+  closeConfirm();
+  renderAll();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   UTILIDADES
+══════════════════════════════════════════════════════════════════ */
+function esc(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   INICIALIZACIÓN
+══════════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  // Si ya tiene sesión activa en esta pestaña del navegador, entrar directo
+  if (sessionStorage.getItem('hpvc_auth') === '1') {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainPanel').style.display = 'block';
+    document.getElementById('headerNav').style.display = 'flex';
+    renderAll();
+  }
+  document.getElementById('pwdInput').focus();
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeConfirm();
+  });
+});
+</script>
+</body>
+</html>
