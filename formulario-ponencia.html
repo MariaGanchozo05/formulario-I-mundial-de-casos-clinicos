@@ -246,7 +246,13 @@ tr:last-child td{border-bottom:none}
           <option>Enfermería</option>
           <option>Nutrición</option>
           <option>Docencia / Investigación</option>
+          <option value="Otros">Otros</option>
         </select>
+        <div id="categoriaJuradoOtraField" hidden>
+          <label for="categoriaJuradoOtra">Especifique la categoría profesional <span class="required">*</span></label>
+          <input id="categoriaJuradoOtra" type="text" disabled placeholder="Ej. Psicología, Odontología, Fisioterapia" aria-describedby="err-categoriaJuradoOtra">
+          <span class="err-msg" id="err-categoriaJuradoOtra">Ingrese la categoría profesional del jurado.</span>
+        </div>
       </div>
       <div class="field">
         <label for="fechaEval">Fecha de evaluación</label>
@@ -507,8 +513,27 @@ function updateTotal() {
 }
 
 /* ══ AGREGAR CASO A LA COLA ══ */
+function actualizarCategoriaJurado() {
+  const esOtra = document.getElementById('categoriaJurado').value === 'Otros';
+  const input = document.getElementById('categoriaJuradoOtra');
+  document.getElementById('categoriaJuradoOtraField').hidden = !esOtra;
+  input.disabled = !esOtra;
+  input.required = esOtra;
+  input.classList.remove('err');
+  input.removeAttribute('aria-invalid');
+  document.getElementById('err-categoriaJuradoOtra').classList.remove('show');
+}
+
 async function addCaseToQueue() {
   let hasErrors = false;
+  const categoriaSeleccionada = document.getElementById('categoriaJurado').value;
+  const categoriaOtra = document.getElementById('categoriaJuradoOtra');
+  const categoriaJurado = categoriaSeleccionada === 'Otros' ? categoriaOtra.value.trim() : categoriaSeleccionada;
+  const faltaCategoria = categoriaSeleccionada === 'Otros' && !categoriaJurado;
+  categoriaOtra.classList.toggle('err', faltaCategoria);
+  categoriaOtra.setAttribute('aria-invalid', String(faltaCategoria));
+  document.getElementById('err-categoriaJuradoOtra').classList.toggle('show', faltaCategoria);
+  if (faltaCategoria) hasErrors = true;
 
   // Validar jurado (solo primera vez)
   const jurado = document.getElementById('jurado').value.trim();
@@ -575,7 +600,7 @@ async function addCaseToQueue() {
 
   const guardado = await guardarCasoEnBD(registro, {
     jurado,
-    categoriaJurado: document.getElementById('categoriaJurado').value,
+    categoriaJurado,
     fecha:           document.getElementById('fechaEval').value
   });
 
@@ -718,6 +743,8 @@ function nuevaSesion() {
   // Limpiar datos del jurado también
   document.getElementById('jurado').value = '';
   document.getElementById('categoriaJurado').value = '';
+  document.getElementById('categoriaJuradoOtra').value = '';
+  actualizarCategoriaJurado();
   document.getElementById('fechaEval').value = fechaHoyLocal();
 }
 
@@ -754,6 +781,8 @@ function esc(str) {
 
 /* ══ INIT ══ */
 document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('categoriaJurado').addEventListener('change', actualizarCategoriaJurado);
+  actualizarCategoriaJurado();
   document.querySelectorAll('[data-validate="letters"]').forEach(attachLetterRestriction);
   document.querySelectorAll('[data-validate="digits"]').forEach(attachDigitRestriction);
   document.getElementById('fechaEval').value = fechaHoyLocal();
