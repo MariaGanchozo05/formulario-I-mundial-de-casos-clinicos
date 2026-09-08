@@ -50,3 +50,24 @@ create policy "Permitir consultar evaluaciones"
 -- expositor (identificación, profesión, institución, correo, teléfono,
 -- coautores). El esquema no tiene esas columnas y los formularios HTML no
 -- las piden.
+
+-- ────────────────────────────────────────────────────────────────────────
+-- MIGRACIÓN 2026-09-07 — Categoría del participante
+-- Solicitada por el comité: los casos compiten en cuatro categorías
+-- (Profesional, Internado, Externado, Posgrado) y gana el de mayor puntaje
+-- dentro de cada categoría.
+--
+-- EJECUTAR UNA SOLA VEZ en el SQL Editor de Supabase:
+-- ────────────────────────────────────────────────────────────────────────
+
+alter table public.casos
+  add column if not exists categoria_participante text;
+
+-- Opcional: restringir a las cuatro categorías oficiales.
+-- alter table public.casos
+--   add constraint casos_categoria_participante_check
+--   check (categoria_participante in ('Profesional','Internado','Externado','Posgrado'));
+
+-- Mientras esta columna no exista, los formularios siguen guardando el caso
+-- sin categoría (ver insertarCaso() en los HTML) y el panel de resultados
+-- muestra esos casos como "Sin categoría".

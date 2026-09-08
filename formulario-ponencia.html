@@ -121,6 +121,7 @@ tr:last-child td{border-bottom:none}
 .qi-score{font-size:14px;font-weight:800;color:var(--accent2)}
 .qi-remove{background:#fee2e2;color:var(--danger);border:none;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;transition:.2s;flex-shrink:0}
 .qi-remove:hover{background:#fca5a5}
+.qi-saved{background:var(--success-bg);color:var(--success);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;flex-shrink:0;white-space:nowrap}
 
 /* CRITERIA */
 .instruction{background:#f3f0ff;border-left:5px solid var(--accent2);padding:12px 16px;border-radius:6px;margin-bottom:18px;font-size:13.5px}
@@ -262,7 +263,7 @@ tr:last-child td{border-bottom:none}
       <span>SELECCIÓN DEL CASO A EVALUAR</span>
     </div>
 
-    <div class="note">Seleccione el servicio y el tipo de caso clínico. Puede calificar múltiples casos en esta sesión antes de guardar.</div>
+    <div class="note">Seleccione la categoría del participante, el servicio y el tipo de caso clínico. Puede calificar múltiples casos en esta sesión antes de guardar.</div>
 
     <!-- Tipo de caso -->
     <label style="font-size:13.5px;font-weight:700;color:var(--primary);display:block;margin-bottom:10px">
@@ -281,8 +282,19 @@ tr:last-child td{border-bottom:none}
     </div>
     <span class="err-msg" id="err-tipo" style="margin-bottom:10px;display:none">Seleccione el tipo de caso clínico.</span>
 
-    <!-- Servicio + Título -->
+    <!-- Categoría del participante + Servicio -->
     <div class="service-row" style="margin-top:6px">
+      <div class="field" style="margin-bottom:0">
+        <label for="categoriaParticipante">Categoría del participante <span class="required">*</span></label>
+        <select id="categoriaParticipante">
+          <option value="">— Seleccione la categoría —</option>
+          <option>Profesional</option>
+          <option>Internado</option>
+          <option>Externado</option>
+          <option>Posgrado</option>
+        </select>
+        <span class="err-msg" id="err-categoria">Seleccione la categoría del participante.</span>
+      </div>
       <div class="field" style="margin-bottom:0">
         <label for="areaServicio">Servicio hospitalario <span class="required">*</span></label>
         <select id="areaServicio">
@@ -295,11 +307,11 @@ tr:last-child td{border-bottom:none}
         </select>
         <span class="err-msg" id="err-area">Seleccione el servicio hospitalario.</span>
       </div>
-      <div class="field" style="margin-bottom:0">
-        <label for="tituloCaso">Título del caso clínico <span class="required">*</span></label>
-        <input id="tituloCaso" type="text" placeholder="Título oficial del caso presentado" maxlength="250">
-        <span class="err-msg" id="err-titulo">Ingrese el título del caso.</span>
-      </div>
+    </div>
+    <div class="field" style="margin-top:12px;margin-bottom:0">
+      <label for="tituloCaso">Título del caso clínico <span class="required">*</span></label>
+      <input id="tituloCaso" type="text" placeholder="Título oficial del caso presentado" maxlength="250">
+      <span class="err-msg" id="err-titulo">Ingrese el título del caso.</span>
     </div>
   </section>
 
@@ -344,19 +356,19 @@ tr:last-child td{border-bottom:none}
   <!-- ══ COLA DE CASOS AGREGADOS EN ESTA SESIÓN ══ -->
   <div class="queue-card" id="queueSection">
     <div class="queue-header">
-      <h3>Casos agregados en esta sesión</h3>
+      <h3>Casos guardados en esta sesión</h3>
       <span class="queue-count" id="queueCount">0 casos</span>
     </div>
     <div id="queueList">
-      <p class="queue-empty">Aún no ha agregado ningún caso. Complete el formulario y presione "Agregar este caso a la evaluación".</p>
+      <p class="queue-empty">Aún no ha guardado ningún caso. Complete el formulario y presione "Agregar este caso a la evaluación": cada caso se guarda al instante.</p>
     </div>
   </div>
 
   <!-- ══ BOTONES FINALES ══ -->
   <div class="button-row">
-    <button type="button" class="btn btn-primary" id="btnGuardarTodo" onclick="guardarTodo()" disabled>
+    <button type="button" class="btn btn-primary" id="btnGuardarTodo" onclick="finalizarSesion()" disabled>
       <svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      Validar y Guardar toda la evaluación
+      Finalizar sesión y ver resumen
     </button>
     <button type="button" class="btn btn-accent" onclick="exportToPdf()">
       <svg class="icon" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="M7 10l5 5 5-5"/><path d="M20 21H4"/></svg>
@@ -411,6 +423,10 @@ const CRITERIA = [
   ["Trabajo interdisciplinario", 2,
    "Valora la integración de diferentes disciplinas (medicina, enfermería, nutrición, laboratorio, imagenología, rehabilitación) y el aporte de cada profesional en el manejo integral."]
 ];
+
+/* ══ MODALIDAD ══ */
+const MODALIDAD   = 'Ponencia Oral';
+const MAX_PUNTAJE = 20;
 
 /* ══ ESTADO ══ */
 const scores = {};         // criterio → valor seleccionado (caso actual)
@@ -491,7 +507,7 @@ function updateTotal() {
 }
 
 /* ══ AGREGAR CASO A LA COLA ══ */
-function addCaseToQueue() {
+async function addCaseToQueue() {
   let hasErrors = false;
 
   // Validar jurado (solo primera vez)
@@ -515,8 +531,9 @@ function addCaseToQueue() {
 
   // Validar campos del caso
   const caseFields = [
-    {id:'areaServicio', err:'err-area'},
-    {id:'tituloCaso',   err:'err-titulo'}
+    {id:'categoriaParticipante', err:'err-categoria'},
+    {id:'areaServicio',          err:'err-area'},
+    {id:'tituloCaso',            err:'err-titulo'}
   ];
   caseFields.forEach(f => {
     const el = document.getElementById(f.id);
@@ -537,33 +554,40 @@ function addCaseToQueue() {
 
   if (hasErrors) { document.querySelector('.err')?.scrollIntoView({behavior:'smooth',block:'center'}); return; }
 
-  const area = document.getElementById('areaServicio').value;
-  const total = Object.values(scores).reduce((s,v)=>s+Number(v||0),0);
-
-  // Leer radio adm
-  const getRadio = name => { const el = document.querySelector(`input[name="${name}"]:checked`); return el?el.value:''; };
-
-  const record = {
-    _sessionId: Date.now() + Math.random(),
-    tipoCaso: tipoSeleccionado,
-    area,
-    titulo: document.getElementById('tituloCaso').value.trim(),
-    adm1: getRadio('adm1'), adm2: getRadio('adm2'), adm3: getRadio('adm3'), adm4: getRadio('adm4'),
-    dictamen: document.getElementById('dictamen').value,
-    obsComite: document.getElementById('obsComite').value.trim(),
-    scores: {...scores},
-    puntaje: total,
+  const registro = {
+    _sessionId:    Date.now() + Math.random(),
+    modalidad:     MODALIDAD,
+    tipoCaso:      tipoSeleccionado,
+    categoriaParticipante: document.getElementById('categoriaParticipante').value,
+    area:          document.getElementById('areaServicio').value,
+    titulo:        document.getElementById('tituloCaso').value.trim(),
+    scores:        {...scores},
+    puntaje:       Object.values(scores).reduce((s,v)=>s+Number(v||0),0),
+    maxPuntaje:    MAX_PUNTAJE,
     observaciones: document.getElementById('observaciones').value.trim()
   };
 
-  sessionQueue.push(record);
+  // El caso se guarda en la base de datos AQUI, no al final de la sesion.
+  const btn  = document.getElementById('btnAddCase');
+  const orig = btn.innerHTML;
+  btn.disabled = true;                    // evita guardados duplicados por doble clic
+  btn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.22-8.56"/></svg> Guardando\u2026';
+
+  const guardado = await guardarCasoEnBD(registro, {
+    jurado,
+    categoriaJurado: document.getElementById('categoriaJurado').value,
+    fecha:           document.getElementById('fechaEval').value
+  });
+
+  btn.disabled = false;
+  if (!guardado) { btn.innerHTML = orig; return; }   // el error ya se mostro al usuario
+
+  registro._dbId = guardado.id;
+  sessionQueue.push(registro);
   renderQueue();
   resetCaseForm();
 
-  // Feedback visual
-  const btn = document.getElementById('btnAddCase');
-  const orig = btn.innerHTML;
-  btn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Caso agregado';
+  btn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Caso guardado';
   btn.style.background = 'var(--success)';
   setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
 
@@ -577,7 +601,7 @@ function renderQueue() {
 
   const list = document.getElementById('queueList');
   if (!sessionQueue.length) {
-    list.innerHTML = '<p class="queue-empty">Aún no ha agregado ningún caso. Complete el formulario y presione "Agregar este caso a la evaluación".</p>';
+    list.innerHTML = '<p class="queue-empty">Aún no ha guardado ningún caso. Complete el formulario y presione "Agregar este caso a la evaluación": cada caso se guarda al instante.</p>';
     return;
   }
   list.innerHTML = sessionQueue.map((r, idx) => `
@@ -585,18 +609,14 @@ function renderQueue() {
       <span class="qi-pos">${idx+1}</span>
       <div class="qi-info">
         <div class="qi-title">${esc(r.titulo)}</div>
-        <div class="qi-meta">${esc(r.tipoCaso)} · ${esc(r.area)}</div>
+        <div class="qi-meta">${esc(r.categoriaParticipante)} · ${esc(r.tipoCaso)} · ${esc(r.area)}</div>
       </div>
-      <span class="qi-score">${r.puntaje} / 20</span>
-      <button type="button" class="qi-remove" onclick="removeFromQueue(${idx})">Quitar</button>
+      <span class="qi-score">${r.puntaje} / ${MAX_PUNTAJE}</span>
+      <span class="qi-saved">✓ Guardado</span>
     </div>
   `).join('');
 }
 
-function removeFromQueue(idx) {
-  sessionQueue.splice(idx, 1);
-  renderQueue();
-}
 
 /* ══ RESET DEL CASO ACTUAL (sin borrar datos del jurado) ══ */
 function resetCaseForm() {
@@ -608,22 +628,15 @@ function resetCaseForm() {
   document.getElementById('err-tipo').style.display = 'none';
 
   // Limpiar selects con selectedIndex para garantizar la opción vacía
-  ['areaServicio','dictamen','categoriaJurado'].forEach(id => {
+  // (NO se toca categoriaJurado: los datos del jurado son fijos para la sesión)
+  ['categoriaParticipante','areaServicio'].forEach(id => {
     const el = document.getElementById(id); if (el) el.selectedIndex = 0;
   });
 
   // Limpiar inputs y textareas de datos del caso
-  ['tituloCaso','obsComite','observaciones'].forEach(id => {
+  ['tituloCaso','observaciones'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
-
-  // Radios admin — desmarcar todos
-  ['adm1','adm2','adm3','adm4'].forEach(name => {
-    document.querySelectorAll(`input[name="${name}"]`).forEach(r => r.checked = false);
-  });
-
-  // Checkboxes declaración — desmarcar todos
-  document.querySelectorAll('.dec-check').forEach(c => c.checked = false);
 
   // Criterios de evaluación — limpiar puntuaciones
   Object.keys(scores).forEach(k => delete scores[k]);
@@ -638,68 +651,62 @@ function resetCaseForm() {
   document.querySelector('.card:nth-child(2)').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-/* ══ GUARDAR TODA LA SESIÓN ══ */
-async function guardarTodo() {
-  if (!sessionQueue.length) { alert('No hay casos en la lista.'); return; }
+/* ══ INSERTAR CASO (tolera que falte la columna categoria_participante) ══ */
+async function insertarCaso(registro) {
+  const payload = {
+    modalidad: registro.modalidad,
+    tipo_caso: registro.tipoCaso,
+    categoria_participante: registro.categoriaParticipante || null,
+    area: registro.area,
+    titulo: registro.titulo
+  };
+  let { data, error } = await supabaseClient.from('casos').insert(payload).select('id').single();
 
-  const jurado   = document.getElementById('jurado').value.trim();
-  const categoria= document.getElementById('categoriaJurado').value;
-  const fecha    = document.getElementById('fechaEval').value;
-
-  if (!jurado) {
-    document.getElementById('jurado').classList.add('err');
-    document.getElementById('err-jurado').classList.add('show');
-    document.getElementById('jurado').scrollIntoView({behavior:'smooth',block:'center'});
-    return;
+  // Si la columna aun no fue creada en Supabase, se reintenta sin ella para no
+  // bloquear el guardado. Ejecute el ALTER TABLE de supabase-schema.sql.
+  if (error && /categoria_participante/.test(error.message || '')) {
+    console.warn('Falta la columna casos.categoria_participante en Supabase; se guarda sin categoria. Ejecute el ALTER TABLE de supabase-schema.sql.');
+    delete payload.categoria_participante;
+    ({ data, error } = await supabaseClient.from('casos').insert(payload).select('id').single());
   }
+  if (error) { alert(`No se pudo guardar el caso en Supabase: ${error.message}`); return null; }
+  return data;
+}
 
-  const timestamp = new Date();
-  const fechaStr = timestamp.toLocaleDateString('es-EC') + ' ' + timestamp.toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'});
+/* ══ GUARDAR UN CASO EN LA BASE DE DATOS ══ */
+async function guardarCasoEnBD(registro, evaluador) {
+  const caso = await insertarCaso(registro);
+  if (!caso) return null;
 
-  const records = sessionQueue.map(r => ({
-      modalidad: 'Ponencia Oral',
-      fecha: fecha ? new Date(fecha+'T12:00:00').toLocaleDateString('es-EC') : fechaStr,
-      jurado,
-      categoria,
-      tipoCaso: r.tipoCaso,
-      area: r.area,
-      titulo: r.titulo,
-      dictamen: r.dictamen,
-      obsComite: r.obsComite,
-      scores: r.scores,
-      puntaje: r.puntaje,
-      maxPuntaje: 20,
-      observaciones: r.observaciones
-    }));
-
-  for (const registro of records) {
-    const { data: caso, error: casoError } = await supabaseClient.from('casos').insert({
-      modalidad: registro.modalidad,
-      tipo_caso: registro.tipoCaso,
-      area: registro.area,
-      titulo: registro.titulo,
-      dictamen: registro.dictamen || null,
-      observaciones_comite: registro.obsComite || null
-    }).select('id').single();
-    if (casoError) { alert(`No se pudo guardar el caso en Supabase: ${casoError.message}`); return; }
-
-    const { error } = await supabaseClient.from('evaluaciones').insert({
-      caso_id: caso.id,
-      jurado_nombre: registro.jurado,
-      categoria_jurado: registro.categoria || null,
-      puntaje: registro.puntaje,
-      max_puntaje: registro.maxPuntaje,
-      puntajes_criterios: registro.scores,
-      observaciones: registro.observaciones || null,
-      fecha_evaluacion: fecha || null
-    });
-    if (error) { alert(`No se pudo guardar la evaluación en Supabase: ${error.message}`); return; }
+  const { error } = await supabaseClient.from('evaluaciones').insert({
+    caso_id: caso.id,
+    jurado_nombre: evaluador.jurado,
+    categoria_jurado: evaluador.categoriaJurado || null,
+    puntaje: registro.puntaje,
+    max_puntaje: registro.maxPuntaje,
+    puntajes_criterios: registro.scores,
+    observaciones: registro.observaciones || null,
+    fecha_evaluacion: evaluador.fecha || null
+  });
+  if (error) {
+    alert(`No se pudo guardar la evaluaci\u00f3n en Supabase: ${error.message}`);
+    return null;
   }
+  return caso;
+}
+
+/* ══ FINALIZAR SESIÓN — resumen; los casos ya estan guardados ══ */
+function finalizarSesion() {
+  if (!sessionQueue.length) { alert('A\u00fan no ha guardado ning\u00fan caso en esta sesi\u00f3n.'); return; }
+
+  const jurado = document.getElementById('jurado').value.trim();
+  const avg = (sessionQueue.reduce((s,r)=>s+r.puntaje,0)/sessionQueue.length).toFixed(1);
 
   document.getElementById('modalDesc').innerHTML =
     `Jurado: <strong>${esc(jurado)}</strong><br>
      Casos guardados: <strong>${sessionQueue.length}</strong><br>
-     Puntaje promedio: <strong>${(sessionQueue.reduce((s,r)=>s+r.puntaje,0)/sessionQueue.length).toFixed(1)} / 20 pts</strong>`;
+     Puntaje promedio: <strong>${avg} / ${MAX_PUNTAJE} pts</strong><br>
+     <a href="resultados.html" style="color:var(--accent);font-weight:700;text-decoration:none">Ver el panel de resultados \u2192</a>`;
   document.getElementById('saveModal').classList.add('active');
 }
 
@@ -711,7 +718,7 @@ function nuevaSesion() {
   // Limpiar datos del jurado también
   document.getElementById('jurado').value = '';
   document.getElementById('categoriaJurado').value = '';
-  document.getElementById('fechaEval').value = new Date().toISOString().split('T')[0];
+  document.getElementById('fechaEval').value = fechaHoyLocal();
 }
 
 /* ══ MODAL ══ */
@@ -734,6 +741,12 @@ function exportToPdf() {
   else { restore(); window.print(); }
 }
 
+/* ══ FECHA LOCAL (evita el desfase de un dia que produce toISOString en UTC) ══ */
+function fechaHoyLocal() {
+  const d = new Date();
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+}
+
 /* ══ UTILIDAD ══ */
 function esc(str) {
   return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -743,7 +756,7 @@ function esc(str) {
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-validate="letters"]').forEach(attachLetterRestriction);
   document.querySelectorAll('[data-validate="digits"]').forEach(attachDigitRestriction);
-  document.getElementById('fechaEval').value = new Date().toISOString().split('T')[0];
+  document.getElementById('fechaEval').value = fechaHoyLocal();
   renderCriteria();
   updateTotal();
   renderQueue();

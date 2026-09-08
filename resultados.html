@@ -200,6 +200,31 @@ td.center { text-align: center; }
 .podium-card.silver .podium-score { color: var(--silver); }
 .podium-card.bronze .podium-score { color: var(--bronze); }
 
+/* Bloques por categoría */
+.cat-block { margin-bottom: 22px; }
+.cat-title {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 10px;
+}
+.cat-chip {
+  display: inline-block; padding: 4px 11px; border-radius: 6px;
+  font-size: 11.5px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase;
+}
+.cat-profesional { background: #e0f2fe; color: #075985; }
+.cat-internado   { background: #fef3c7; color: #92400e; }
+.cat-externado   { background: #dcfce7; color: #166534; }
+.cat-posgrado    { background: var(--accent2-light); color: #5b21b6; }
+.cat-sin         { background: #f1f5f9; color: var(--text-muted); }
+.cat-count { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+/* auto-fill evita que una categoría con un solo caso ocupe todo el ancho */
+.cat-block .podium-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); margin-bottom: 0; }
+.podium-pct { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
+.jurados-chip {
+  display: inline-block; background: #f1f5f9; color: var(--text-muted);
+  border-radius: 5px; padding: 2px 7px; font-size: 11px; font-weight: 700;
+}
+.score-pct { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 1px; }
+
 /* Vacío */
 .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); }
 .empty-state svg { width: 48px; height: 48px; margin: 0 auto 12px; display: block; opacity: 0.35; }
@@ -316,7 +341,14 @@ td.center { text-align: center; }
     <!-- Filtros -->
     <div class="filters">
       <label>Filtrar por:</label>
-      <select id="filterArea" onchange="renderTable()">
+      <select id="filterCategoria" onchange="renderAll()">
+        <option value="">Todas las categorías</option>
+        <option>Profesional</option>
+        <option>Internado</option>
+        <option>Externado</option>
+        <option>Posgrado</option>
+      </select>
+      <select id="filterArea" onchange="renderAll()">
         <option value="">Todos los servicios</option>
         <option>Cirugía</option>
         <option>Medicina Interna</option>
@@ -327,8 +359,8 @@ td.center { text-align: center; }
         <option>Nutrición</option>
         <option>Otra Especialidad</option>
       </select>
-      <input type="text" id="filterSearch" placeholder="Buscar por título…" oninput="renderTable()" style="min-width:220px">
-      <select id="filterSort" onchange="renderTable()">
+      <input type="text" id="filterSearch" placeholder="Buscar por título…" oninput="renderAll()" style="min-width:220px">
+      <select id="filterSort" onchange="renderAll()">
         <option value="score_desc">Mayor puntaje primero</option>
         <option value="score_asc">Menor puntaje primero</option>
         <option value="date_desc">Más reciente primero</option>
@@ -336,8 +368,8 @@ td.center { text-align: center; }
       </select>
     </div>
 
-    <!-- Podio (solo top 3 de la pestaña activa) -->
-    <div class="ranking-section" id="podiumSection"></div>
+    <!-- Ganadores por categoría (Profesional / Internado / Externado / Posgrado) -->
+    <div class="ranking-section" id="winnersSection"></div>
 
     <!-- Tabla -->
     <div class="table-wrap">
@@ -347,10 +379,11 @@ td.center { text-align: center; }
             <th class="center" style="width:46px">#</th>
             <th class="center" style="width:56px">Pos.</th>
             <th>Título del Caso</th>
+            <th class="center">Categoría</th>
             <th>Servicio</th>
             <th class="center">Modalidad</th>
             <th class="center">Puntaje</th>
-            <th>Jurado</th>
+            <th class="center">Jurados</th>
             <th>Fecha</th>
           </tr>
         </thead>
@@ -371,16 +404,25 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
    ESTADO
 ══════════════════════════════════════════════════════════════════ */
 let currentTab = 'todos';
+let allRecords = [];   // una fila por evaluación individual de jurado
+let allCases   = [];   // una fila por caso (evaluaciones agrupadas)
+
+const CATEGORIAS    = ['Profesional', 'Internado', 'Externado', 'Posgrado'];
+const SIN_CATEGORIA = 'Sin categoría';
+const CAT_CLASS = {
+  'Profesional': 'cat-profesional',
+  'Internado':   'cat-internado',
+  'Externado':   'cat-externado',
+  'Posgrado':    'cat-posgrado'
+};
 
 /* ══════════════════════════════════════════════════════════════════
-   DATOS
+   CARGA DE DATOS
 ══════════════════════════════════════════════════════════════════ */
-let allRecords = [];
-
 async function loadRecords() {
   const { data, error } = await supabaseClient
     .from('evaluaciones')
-    .select('id, jurado_nombre, categoria_jurado, puntaje, max_puntaje, puntajes_criterios, observaciones, fecha_evaluacion, created_at, casos(*)')
+    .select('id, caso_id, jurado_nombre, categoria_jurado, puntaje, max_puntaje, puntajes_criterios, observaciones, fecha_evaluacion, created_at, casos(*)')
     .order('created_at', { ascending: false });
   if (error) {
     alert(`No se pudieron cargar los resultados desde Supabase: ${error.message}`);
@@ -388,46 +430,94 @@ async function loadRecords() {
   }
   allRecords = (data || []).map(row => ({
     ...row.casos,
-    jurado: row.jurado_nombre,
-    categoria: row.categoria_jurado,
-    puntaje: row.puntaje,
-    maxPuntaje: row.max_puntaje,
-    scores: row.puntajes_criterios,
+    casoId:     row.caso_id,
+    categoria:  (row.casos && row.casos.categoria_participante) || SIN_CATEGORIA,
+    jurado:     row.jurado_nombre,
+    puntaje:    Number(row.puntaje) || 0,
+    maxPuntaje: Number(row.max_puntaje) || 0,
+    scores:     row.puntajes_criterios,
     observaciones: row.observaciones,
-    fecha: row.fecha_evaluacion || row.created_at,
-    _dbId: row.id,
+    fecha:      row.fecha_evaluacion || row.created_at,
+    _dbId:      row.id,
     _createdAt: row.created_at
   }));
+  allCases = agruparPorCaso(allRecords);
   renderAll();
 }
 
-function getAllRecords() {
-  return [...allRecords].sort((a, b) => b.puntaje - a.puntaje);
+/* Agrupa las evaluaciones de un mismo caso. El puntaje con el que el caso
+   compite es el PROMEDIO de todos los jurados que lo calificaron, de modo que
+   un caso evaluado por tres jurados ocupe una sola posición en el ranking. */
+function agruparPorCaso(records) {
+  const map = new Map();
+
+  records.forEach(r => {
+    const key = r.casoId || `eval-${r._dbId}`;
+    if (!map.has(key)) {
+      map.set(key, {
+        casoId:     key,
+        titulo:     r.titulo,
+        categoria:  r.categoria,
+        area:       r.area,
+        tipoCaso:   r.tipo_caso,
+        modalidad:  r.modalidad,
+        maxPuntaje: r.maxPuntaje,
+        evaluaciones: [],
+        _createdAt: r._createdAt
+      });
+    }
+    const c = map.get(key);
+    c.evaluaciones.push({ jurado: r.jurado, puntaje: r.puntaje, fecha: r.fecha });
+    if (!c.maxPuntaje && r.maxPuntaje) c.maxPuntaje = r.maxPuntaje;
+    if (new Date(r._createdAt) > new Date(c._createdAt)) c._createdAt = r._createdAt;
+  });
+
+  return [...map.values()].map(c => {
+    if (!c.maxPuntaje) c.maxPuntaje = c.modalidad === 'Póster Científico' ? 100 : 20;
+    const suma = c.evaluaciones.reduce((s, e) => s + e.puntaje, 0);
+    c.nJurados  = c.evaluaciones.length;
+    c.sumaTotal = suma;
+    c.promedio  = suma / c.nJurados;
+    c.puntaje   = Math.round(c.promedio * 10) / 10;      // puntaje oficial del caso
+    c.porcentaje = c.maxPuntaje ? (c.promedio / c.maxPuntaje) * 100 : 0;
+    c.jurados   = c.evaluaciones.map(e => e.jurado).filter(Boolean);
+    c.fecha     = c.evaluaciones[0].fecha;
+    return c;
+  });
 }
 
-function getFilteredRecords() {
-  let records = getAllRecords();
+/* Orden oficial: mayor porcentaje del puntaje máximo. Dentro de una misma
+   modalidad equivale a ordenar por puntaje, y permite comparar de forma justa
+   póster (100 pts) con ponencia (20 pts) en la pestaña "Todos". */
+function porPuntaje(a, b) {
+  return (b.porcentaje - a.porcentaje) || (b.promedio - a.promedio);
+}
 
-  // filtro pestaña
-  if (currentTab === 'poster')   records = records.filter(r => r.modalidad === 'Póster Científico');
-  if (currentTab === 'ponencia') records = records.filter(r => r.modalidad === 'Ponencia Oral');
+/* ══════════════════════════════════════════════════════════════════
+   FILTROS
+══════════════════════════════════════════════════════════════════ */
+function getFilteredCases() {
+  let cases = [...allCases];
 
-  // filtro área
+  if (currentTab === 'poster')   cases = cases.filter(c => c.modalidad === 'Póster Científico');
+  if (currentTab === 'ponencia') cases = cases.filter(c => c.modalidad === 'Ponencia Oral');
+
+  const cat = document.getElementById('filterCategoria')?.value;
+  if (cat) cases = cases.filter(c => c.categoria === cat);
+
   const area = document.getElementById('filterArea')?.value;
-  if (area) records = records.filter(r => r.area === area);
+  if (area) cases = cases.filter(c => c.area === area);
 
-  // búsqueda texto
   const q = (document.getElementById('filterSearch')?.value || '').toLowerCase();
-  if (q) records = records.filter(r => (r.titulo || '').toLowerCase().includes(q));
+  if (q) cases = cases.filter(c => (c.titulo || '').toLowerCase().includes(q));
 
-  // orden
   const sort = document.getElementById('filterSort')?.value || 'score_desc';
-  if (sort === 'score_desc') records.sort((a,b) => b.puntaje - a.puntaje);
-  if (sort === 'score_asc')  records.sort((a,b) => a.puntaje - b.puntaje);
-  if (sort === 'date_desc')  records.sort((a,b) => new Date(b._createdAt) - new Date(a._createdAt));
-  if (sort === 'date_asc')   records.sort((a,b) => new Date(a._createdAt) - new Date(b._createdAt));
+  if (sort === 'score_desc') cases.sort(porPuntaje);
+  if (sort === 'score_asc')  cases.sort((a, b) => porPuntaje(b, a));
+  if (sort === 'date_desc')  cases.sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt));
+  if (sort === 'date_asc')   cases.sort((a, b) => new Date(a._createdAt) - new Date(b._createdAt));
 
-  return records;
+  return cases;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -435,142 +525,168 @@ function getFilteredRecords() {
 ══════════════════════════════════════════════════════════════════ */
 function renderAll() {
   renderStats();
-  renderPodium();
+  renderWinners();
   renderTable();
 }
 
 function switchTab(tab) {
   currentTab = tab;
-  ['todos','poster','ponencia'].forEach(t => {
+  ['todos', 'poster', 'ponencia'].forEach(t => {
     document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
   });
   renderAll();
 }
 
-/* ── Stats ── */
+function tabSuffix() {
+  if (currentTab === 'poster')   return ' — Póster Científico';
+  if (currentTab === 'ponencia') return ' — Ponencia Oral';
+  return '';
+}
+
+/* ── Estadísticas ── */
 function renderStats() {
-  const all      = getAllRecords();
-  const posters  = all.filter(r => r.modalidad === 'Póster Científico');
-  const ponencias= all.filter(r => r.modalidad === 'Ponencia Oral');
-  const avgPoster  = posters.length  ? (posters.reduce((s,r)=>s+r.puntaje,0)/posters.length).toFixed(1) : '—';
-  const avgPonencia= ponencias.length? (ponencias.reduce((s,r)=>s+r.puntaje,0)/ponencias.length).toFixed(1): '—';
-  const topPoster  = posters.length  ? Math.max(...posters.map(r=>r.puntaje))  : '—';
-  const topPonencia= ponencias.length? Math.max(...ponencias.map(r=>r.puntaje)): '—';
+  const posters   = allCases.filter(c => c.modalidad === 'Póster Científico');
+  const ponencias = allCases.filter(c => c.modalidad === 'Ponencia Oral');
+  const prom = arr => arr.length ? (arr.reduce((s, c) => s + c.promedio, 0) / arr.length).toFixed(1) : '—';
+  const top  = arr => arr.length ? (Math.round(Math.max(...arr.map(c => c.promedio)) * 10) / 10) : '—';
+
+  const ABREV = { 'Profesional':'Prof.', 'Internado':'Int.', 'Externado':'Ext.', 'Posgrado':'Posg.' };
+  const conteoCat = CATEGORIAS
+    .map(cat => `${ABREV[cat]} ${allCases.filter(c => c.categoria === cat).length}`)
+    .join(' · ');
 
   document.getElementById('statsGrid').innerHTML = `
     <div class="stat-card">
-      <div class="stat-label">Total evaluaciones</div>
-      <div class="stat-value">${all.length}</div>
-      <div class="stat-sub">${posters.length} póster · ${ponencias.length} ponencia</div>
+      <div class="stat-label">Casos evaluados</div>
+      <div class="stat-value">${allCases.length}</div>
+      <div class="stat-sub">${allRecords.length} calificación(es) de jurado</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Póster — prom. / máx.</div>
-      <div class="stat-value" style="color:var(--accent)">${avgPoster}</div>
-      <div class="stat-sub">Máximo registrado: ${topPoster} / 100</div>
+      <div class="stat-value" style="color:var(--accent)">${prom(posters)}</div>
+      <div class="stat-sub">Máximo registrado: ${top(posters)} / 100</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Ponencia — prom. / máx.</div>
-      <div class="stat-value" style="color:var(--accent2)">${avgPonencia}</div>
-      <div class="stat-sub">Máximo registrado: ${topPonencia} / 20</div>
+      <div class="stat-value" style="color:var(--accent2)">${prom(ponencias)}</div>
+      <div class="stat-sub">Máximo registrado: ${top(ponencias)} / 20</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Servicios con evaluación</div>
-      <div class="stat-value">${new Set(all.map(r=>r.area).filter(Boolean)).size}</div>
-      <div class="stat-sub">de 5 servicios registrados</div>
+      <div class="stat-label">Casos por categoría</div>
+      <div class="stat-value">${CATEGORIAS.filter(cat => allCases.some(c => c.categoria === cat)).length} / 4</div>
+      <div class="stat-sub">${conteoCat}</div>
     </div>
   `;
 }
 
-/* ── Podio ── */
-function renderPodium() {
-  const records = getFilteredRecords().slice(0, 3);
-  const classes = ['gold','silver','bronze'];
-  const labels  = ['🥇 1.er Lugar','🥈 2.º Lugar','🥉 3.er Lugar'];
-  const section = document.getElementById('podiumSection');
+/* ── Ganadores por categoría ── */
+function renderWinners() {
+  const cases   = getFilteredCases();
+  const section = document.getElementById('winnersSection');
 
-  if (!records.length) { section.innerHTML = ''; return; }
+  if (!cases.length) { section.innerHTML = ''; return; }
+
+  const classes = ['gold', 'silver', 'bronze'];
+  const labels  = ['🥇 Ganador de la categoría', '🥈 2.º Lugar', '🥉 3.er Lugar'];
+  const cats    = [...CATEGORIAS, SIN_CATEGORIA].filter(cat => cases.some(c => c.categoria === cat));
 
   section.innerHTML = `
     <h3>
       <svg class="icon" style="width:18px;height:18px" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      Tabla de Posiciones${currentTab!=='todos'?' — '+(currentTab==='poster'?'Póster Científico':'Ponencia Oral'):''}
+      Ganadores por categoría${tabSuffix()}
     </h3>
-    <div class="podium-grid">
-      ${records.map((r,i) => `
-        <div class="podium-card ${classes[i]}">
-          <div class="podium-pos">${labels[i]}</div>
-          <div class="podium-title">${esc(r.titulo || 'Sin título')}</div>
-          <div class="podium-meta">${esc(r.area||'—')}</div>
-          <div class="podium-score">${r.puntaje} <span style="font-size:14px;font-weight:600;opacity:0.6">/ ${r.maxPuntaje||'—'} pts</span></div>
-        </div>
-      `).join('')}
-    </div>
+    ${cats.map(cat => {
+      const deCat = cases.filter(c => c.categoria === cat).sort(porPuntaje);
+      const podio = deCat.slice(0, 3);
+      return `
+        <div class="cat-block">
+          <div class="cat-title">
+            <span class="cat-chip ${CAT_CLASS[cat] || 'cat-sin'}">${esc(cat)}</span>
+            <span class="cat-count">${deCat.length} caso${deCat.length === 1 ? '' : 's'} en competencia</span>
+          </div>
+          <div class="podium-grid">
+            ${podio.map((c, i) => `
+              <div class="podium-card ${classes[i]}">
+                <div class="podium-pos">${labels[i]}</div>
+                <div class="podium-title">${esc(c.titulo || 'Sin título')}</div>
+                <div class="podium-meta">${esc(c.area || '—')} · ${esc(c.modalidad || '—')}</div>
+                <div class="podium-score">${c.puntaje} <span style="font-size:14px;font-weight:600;opacity:0.6">/ ${c.maxPuntaje} pts</span></div>
+                <div class="podium-pct">${c.porcentaje.toFixed(1)}% · promedio de ${c.nJurados} jurado${c.nJurados === 1 ? '' : 's'}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+    }).join('')}
   `;
 }
 
 /* ── Tabla ── */
 function renderTable() {
-  renderPodium();
-  const records = getFilteredRecords();
+  const cases = getFilteredCases();
   const tbody = document.getElementById('resultsBody');
 
-  if (!records.length) {
+  if (!cases.length) {
     tbody.innerHTML = `
-      <tr><td colspan="8">
+      <tr><td colspan="9">
         <div class="empty-state">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
           </svg>
-          <p>No hay evaluaciones registradas${currentTab!=='todos'?' para esta modalidad':''}.</p>
+          <p>No hay evaluaciones registradas${currentTab !== 'todos' ? ' para esta modalidad' : ''}.</p>
         </div>
       </td></tr>`;
     return;
   }
 
-  let html = '';
-  records.forEach((r, idx) => {
-    const pos = idx + 1;
-    const posClass = pos===1?'pos-1':pos===2?'pos-2':pos===3?'pos-3':'pos-n';
-    const posLabel = pos<=3?`${pos}.º`:`${pos}`;
-    const isPoster = r.modalidad === 'Póster Científico';
-    const scoreClass = isPoster ? 'score-poster' : 'score-ponencia';
-    const modClass   = isPoster ? 'mod-poster'   : 'mod-ponencia';
-    const rid = `det-${r._dbId || r.id}`;
-    const maxPts = r.maxPuntaje || (isPoster ? 100 : 20);
+  tbody.innerHTML = cases.map((c, idx) => {
+    const pos       = idx + 1;
+    const posClass  = pos === 1 ? 'pos-1' : pos === 2 ? 'pos-2' : pos === 3 ? 'pos-3' : 'pos-n';
+    const posLabel  = pos <= 3 ? `${pos}.º` : `${pos}`;
+    const isPoster  = c.modalidad === 'Póster Científico';
+    const scoreClass= isPoster ? 'score-poster' : 'score-ponencia';
+    const modClass  = isPoster ? 'mod-poster'   : 'mod-ponencia';
 
-    html += `
+    return `
       <tr class="main-row">
-        <td class="center" style="color:var(--text-muted);font-size:12px">${idx+1}</td>
+        <td class="center" style="color:var(--text-muted);font-size:12px">${pos}</td>
         <td class="center"><span class="pos-badge ${posClass}">${posLabel}</span></td>
-        <td><strong>${esc(r.titulo||'Sin título')}</strong></td>
-        <td>${esc(r.area||'—')}</td>
-        <td class="center"><span class="mod-badge ${modClass}">${esc(r.modalidad)}</span></td>
-        <td class="center"><span class="score-chip ${scoreClass}">${r.puntaje} / ${maxPts}</span></td>
-        <td class="jurado-cell">${esc(r.jurado||'—')}</td>
-        <td style="font-size:12px;white-space:nowrap">${esc(formatFecha(r.fecha))}</td>
+        <td><strong>${esc(c.titulo || 'Sin título')}</strong></td>
+        <td class="center"><span class="cat-chip ${CAT_CLASS[c.categoria] || 'cat-sin'}">${esc(c.categoria)}</span></td>
+        <td>${esc(c.area || '—')}</td>
+        <td class="center"><span class="mod-badge ${modClass}">${esc(c.modalidad)}</span></td>
+        <td class="center">
+          <span class="score-chip ${scoreClass}">${c.puntaje} / ${c.maxPuntaje}</span>
+          <span class="score-pct">${c.porcentaje.toFixed(1)}%</span>
+        </td>
+        <td class="center">
+          <span class="jurados-chip" title="${esc(c.jurados.join(', '))}">${c.nJurados}</span>
+        </td>
+        <td style="font-size:12px;white-space:nowrap">${esc(formatFecha(c.fecha))}</td>
       </tr>`;
-  });
-
-  tbody.innerHTML = html;
+  }).join('');
 }
 
 /* ══════════════════════════════════════════════════════════════════
    EXPORTAR CSV
 ══════════════════════════════════════════════════════════════════ */
 function exportCSV() {
-  const records = getFilteredRecords();
-  if (!records.length) { alert('No hay registros para exportar.'); return; }
+  const cases = getFilteredCases();
+  if (!cases.length) { alert('No hay registros para exportar.'); return; }
 
-  const headers = ['Posicion','Titulo del Caso','Servicio','Modalidad','Puntaje','Puntaje Maximo','Jurado','Fecha'];
-  const rows = records.map((r, i) => [
-    i+1, r.titulo, r.area, r.modalidad,
-    r.puntaje, r.maxPuntaje||(r.modalidad==='Póster Científico'?100:20), r.jurado, formatFecha(r.fecha)
-  ].map(v => `"${String(v ?? '-').replace(/"/g,'""')}"`));
+  const headers = ['Posicion', 'Categoria', 'Titulo del Caso', 'Servicio', 'Modalidad',
+                   'Puntaje promedio', 'Puntaje maximo', 'Porcentaje', 'N jurados',
+                   'Jurados', 'Suma de puntajes', 'Fecha'];
 
-  const csv = ['sep=;', [headers, ...rows].map(r => r.join(';')).join('\n')].join('\n');
+  const rows = cases.map((c, i) => [
+    i + 1, c.categoria, c.titulo, c.area, c.modalidad,
+    c.puntaje, c.maxPuntaje, c.porcentaje.toFixed(1) + '%', c.nJurados,
+    c.jurados.join(' | '), c.sumaTotal, formatFecha(c.fecha)
+  ].map(v => `"${String(v ?? '-').replace(/"/g, '""')}"`));
+
+  const csv  = ['sep=;', [headers, ...rows].map(r => r.join(';')).join('\n')].join('\n');
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
   a.href = url; a.download = `Resultados_HPVC2026_${Date.now()}.csv`;
   a.click(); URL.revokeObjectURL(url);
 }
@@ -579,7 +695,7 @@ function exportCSV() {
    UTILIDADES
 ══════════════════════════════════════════════════════════════════ */
 function esc(str) {
-  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function formatFecha(f) {
