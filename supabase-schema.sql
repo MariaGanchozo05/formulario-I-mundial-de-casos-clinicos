@@ -71,3 +71,8 @@ alter table public.casos
 -- Mientras esta columna no exista, los formularios siguen guardando el caso
 -- sin categoría (ver insertarCaso() en los HTML) y el panel de resultados
 -- muestra esos casos como "Sin categoría".
+
+-- Nota 2026-09-08: solo el formulario de Póster registra categoria_participante;
+-- la Ponencia compite por servicio (tipo_caso + area) y guarda esta columna en
+-- null. Como tipo_caso y area son NOT NULL, el Póster los guarda con el texto
+-- fijo 'No aplica'. Ningún formulario envía ya evaluaciones.categoria_jurado.

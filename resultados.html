@@ -174,38 +174,7 @@ td.center { text-align: center; }
 .jurado-cell { font-size: 12px; color: var(--text-muted); }
 .obs-cell { font-size: 12px; color: #475569; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* Sección ranking destacado */
-.ranking-section { margin-bottom: 24px; }
-.ranking-section h3 {
-  font-size: 15px; font-weight: 700; color: var(--primary);
-  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
-}
-.podium-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 14px; margin-bottom: 20px; }
-.podium-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-  padding: 16px 18px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
-}
-.podium-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
-.podium-card.gold::before   { background: #f59e0b; }
-.podium-card.silver::before { background: #94a3b8; }
-.podium-card.bronze::before { background: #b45309; }
-.podium-pos { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-.podium-card.gold   .podium-pos { color: var(--gold); }
-.podium-card.silver .podium-pos { color: var(--silver); }
-.podium-card.bronze .podium-pos { color: var(--bronze); }
-.podium-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 3px; line-height: 1.3; }
-.podium-meta  { font-size: 12px; color: var(--text-muted); }
-.podium-score { font-size: 22px; font-weight: 800; margin-top: 8px; }
-.podium-card.gold   .podium-score { color: var(--gold); }
-.podium-card.silver .podium-score { color: var(--silver); }
-.podium-card.bronze .podium-score { color: var(--bronze); }
-
-/* Bloques por categoría */
-.cat-block { margin-bottom: 22px; }
-.cat-title {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 10px;
-}
+/* Categoría del participante */
 .cat-chip {
   display: inline-block; padding: 4px 11px; border-radius: 6px;
   font-size: 11.5px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase;
@@ -215,10 +184,6 @@ td.center { text-align: center; }
 .cat-externado   { background: #dcfce7; color: #166534; }
 .cat-posgrado    { background: var(--accent2-light); color: #5b21b6; }
 .cat-sin         { background: #f1f5f9; color: var(--text-muted); }
-.cat-count { font-size: 12px; font-weight: 600; color: var(--text-muted); }
-/* auto-fill evita que una categoría con un solo caso ocupe todo el ancho */
-.cat-block .podium-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); margin-bottom: 0; }
-.podium-pct { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 2px; }
 .jurados-chip {
   display: inline-block; background: #f1f5f9; color: var(--text-muted);
   border-radius: 5px; padding: 2px 7px; font-size: 11px; font-weight: 700;
@@ -267,7 +232,6 @@ td.center { text-align: center; }
 
 @media (max-width: 700px) {
   .control-bar { flex-direction: column; align-items: flex-start; }
-  .podium-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -312,11 +276,7 @@ td.center { text-align: center; }
         Resultados Oficiales
       </h2>
       <div class="tab-group">
-        <button class="tab active" onclick="switchTab('todos')" id="tab-todos">
-          <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          Todos
-        </button>
-        <button class="tab" onclick="switchTab('poster')" id="tab-poster">
+        <button class="tab active" onclick="switchTab('poster')" id="tab-poster">
           <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
           Póster
         </button>
@@ -338,7 +298,7 @@ td.center { text-align: center; }
     <!-- Stats -->
     <div class="stats-grid" id="statsGrid"></div>
 
-    <!-- Filtros -->
+    <!-- Filtros de la tabla de resultados -->
     <div class="filters">
       <label>Filtrar por:</label>
       <select id="filterCategoria" onchange="renderAll()">
@@ -347,17 +307,6 @@ td.center { text-align: center; }
         <option>Internado</option>
         <option>Externado</option>
         <option>Posgrado</option>
-      </select>
-      <select id="filterArea" onchange="renderAll()">
-        <option value="">Todos los servicios</option>
-        <option>Cirugía</option>
-        <option>Medicina Interna</option>
-        <option>Ginecología y Obstetricia</option>
-        <option>Pediatría</option>
-        <option>Neonatología</option>
-        <option>Enfermería</option>
-        <option>Nutrición</option>
-        <option>Otra Especialidad</option>
       </select>
       <input type="text" id="filterSearch" placeholder="Buscar por título…" oninput="renderAll()" style="min-width:220px">
       <select id="filterSort" onchange="renderAll()">
@@ -368,11 +317,8 @@ td.center { text-align: center; }
       </select>
     </div>
 
-    <!-- Ganadores por categoría (Profesional / Internado / Externado / Posgrado) -->
-    <div class="ranking-section" id="winnersSection"></div>
-
-    <!-- Tabla -->
-    <div class="table-wrap">
+    <!-- Tabla de resultados (Póster Científico) -->
+    <div class="table-wrap" id="casesTableWrap">
       <table>
         <thead>
           <tr>
@@ -391,6 +337,24 @@ td.center { text-align: center; }
       </table>
     </div>
 
+    <!-- Tabla de posiciones por servicio (solo Ponencia Oral) -->
+    <div class="table-wrap" id="ponenciaTableWrap" style="display:none">
+      <table>
+        <thead>
+          <tr>
+            <th class="center" style="width:46px">#</th>
+            <th class="center" style="width:56px">Pos.</th>
+            <th>Servicio</th>
+            <th class="center">Caso Clínico<br>Medicina <small>(0–20 pts)</small></th>
+            <th class="center">Caso Clínico<br>Enfermería <small>(0–20 pts)</small></th>
+            <th class="center">Caso Clínico<br>Nutrición <small>(0–20 pts)</small></th>
+            <th class="center">Puntaje en Tabla<br>de Posiciones <small>(0–60 pts)</small></th>
+          </tr>
+        </thead>
+        <tbody id="ponenciaBody"></tbody>
+      </table>
+    </div>
+
   </div><!-- /wrap -->
 </div><!-- /mainPanel -->
 
@@ -403,7 +367,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 /* ══════════════════════════════════════════════════════════════════
    ESTADO
 ══════════════════════════════════════════════════════════════════ */
-let currentTab = 'todos';
+let currentTab = 'poster';
 let allRecords = [];   // una fila por evaluación individual de jurado
 let allCases   = [];   // una fila por caso (evaluaciones agrupadas)
 
@@ -415,6 +379,13 @@ const CAT_CLASS = {
   'Externado':   'cat-externado',
   'Posgrado':    'cat-posgrado'
 };
+
+/* Tabla de posiciones de Ponencia Oral: un servicio compite con tres casos
+   (Medicina, Enfermería y Nutrición) de 0–20 pts cada uno; total 0–60 pts. */
+const SERVICIOS_PONENCIA = ['Cirugía', 'Medicina Interna', 'Ginecología y Obstetricia', 'Pediatría', 'Neonatología'];
+const TIPOS_PONENCIA     = ['Medicina', 'Enfermería', 'Nutrición'];
+const MAX_TIPO_PONENCIA  = 20;
+const MAX_TOTAL_PONENCIA = MAX_TIPO_PONENCIA * TIPOS_PONENCIA.length;
 
 /* ══════════════════════════════════════════════════════════════════
    CARGA DE DATOS
@@ -487,8 +458,7 @@ function agruparPorCaso(records) {
 }
 
 /* Orden oficial: mayor porcentaje del puntaje máximo. Dentro de una misma
-   modalidad equivale a ordenar por puntaje, y permite comparar de forma justa
-   póster (100 pts) con ponencia (20 pts) en la pestaña "Todos". */
+   modalidad equivale a ordenar por puntaje. */
 function porPuntaje(a, b) {
   return (b.porcentaje - a.porcentaje) || (b.promedio - a.promedio);
 }
@@ -505,9 +475,6 @@ function getFilteredCases() {
   const cat = document.getElementById('filterCategoria')?.value;
   if (cat) cases = cases.filter(c => c.categoria === cat);
 
-  const area = document.getElementById('filterArea')?.value;
-  if (area) cases = cases.filter(c => c.area === area);
-
   const q = (document.getElementById('filterSearch')?.value || '').toLowerCase();
   if (q) cases = cases.filter(c => (c.titulo || '').toLowerCase().includes(q));
 
@@ -520,27 +487,49 @@ function getFilteredCases() {
   return cases;
 }
 
+/* Agrupa los casos de Ponencia Oral por servicio. Si un servicio tiene más de
+   un caso del mismo tipo, la celda usa el promedio de esos casos. */
+function getPonenciaPorServicio(cases) {
+  const norm = s => String(s || '').trim().toLowerCase();
+  const servicios = SERVICIOS_PONENCIA.map(servicio => {
+    const deServicio = cases.filter(c => norm(c.area) === norm(servicio));
+    const tipos = {};
+    TIPOS_PONENCIA.forEach(tipo => {
+      const deTipo = deServicio.filter(c => norm(c.tipoCaso) === norm(tipo));
+      const prom   = deTipo.length ? deTipo.reduce((s, c) => s + c.promedio, 0) / deTipo.length : null;
+      tipos[tipo]  = {
+        casos:   deTipo,
+        puntaje: prom === null ? null : Math.round(prom * 10) / 10
+      };
+    });
+    const total = TIPOS_PONENCIA.reduce((s, t) => s + (tipos[t].puntaje || 0), 0);
+    return {
+      servicio, tipos,
+      nCasos: deServicio.length,
+      total:  Math.round(total * 10) / 10,
+      porcentaje: (total / MAX_TOTAL_PONENCIA) * 100
+    };
+  });
+
+  const sort = document.getElementById('filterSort')?.value || 'score_desc';
+  servicios.sort((a, b) => sort === 'score_asc' ? a.total - b.total : b.total - a.total);
+  return servicios;
+}
+
 /* ══════════════════════════════════════════════════════════════════
    RENDER PRINCIPAL
 ══════════════════════════════════════════════════════════════════ */
 function renderAll() {
   renderStats();
-  renderWinners();
   renderTable();
 }
 
 function switchTab(tab) {
   currentTab = tab;
-  ['todos', 'poster', 'ponencia'].forEach(t => {
+  ['poster', 'ponencia'].forEach(t => {
     document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
   });
   renderAll();
-}
-
-function tabSuffix() {
-  if (currentTab === 'poster')   return ' — Póster Científico';
-  if (currentTab === 'ponencia') return ' — Ponencia Oral';
-  return '';
 }
 
 /* ── Estadísticas ── */
@@ -579,49 +568,15 @@ function renderStats() {
   `;
 }
 
-/* ── Ganadores por categoría ── */
-function renderWinners() {
-  const cases   = getFilteredCases();
-  const section = document.getElementById('winnersSection');
-
-  if (!cases.length) { section.innerHTML = ''; return; }
-
-  const classes = ['gold', 'silver', 'bronze'];
-  const labels  = ['🥇 Ganador de la categoría', '🥈 2.º Lugar', '🥉 3.er Lugar'];
-  const cats    = [...CATEGORIAS, SIN_CATEGORIA].filter(cat => cases.some(c => c.categoria === cat));
-
-  section.innerHTML = `
-    <h3>
-      <svg class="icon" style="width:18px;height:18px" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      Ganadores por categoría${tabSuffix()}
-    </h3>
-    ${cats.map(cat => {
-      const deCat = cases.filter(c => c.categoria === cat).sort(porPuntaje);
-      const podio = deCat.slice(0, 3);
-      return `
-        <div class="cat-block">
-          <div class="cat-title">
-            <span class="cat-chip ${CAT_CLASS[cat] || 'cat-sin'}">${esc(cat)}</span>
-            <span class="cat-count">${deCat.length} caso${deCat.length === 1 ? '' : 's'} en competencia</span>
-          </div>
-          <div class="podium-grid">
-            ${podio.map((c, i) => `
-              <div class="podium-card ${classes[i]}">
-                <div class="podium-pos">${labels[i]}</div>
-                <div class="podium-title">${esc(c.titulo || 'Sin título')}</div>
-                <div class="podium-meta">${esc(c.area || '—')} · ${esc(c.modalidad || '—')}</div>
-                <div class="podium-score">${c.puntaje} <span style="font-size:14px;font-weight:600;opacity:0.6">/ ${c.maxPuntaje} pts</span></div>
-                <div class="podium-pct">${c.porcentaje.toFixed(1)}% · promedio de ${c.nJurados} jurado${c.nJurados === 1 ? '' : 's'}</div>
-              </div>
-            `).join('')}
-          </div>
-        </div>`;
-    }).join('')}
-  `;
-}
-
 /* ── Tabla ── */
 function renderTable() {
+  const isPonencia = currentTab === 'ponencia';
+  document.getElementById('casesTableWrap').style.display    = isPonencia ? 'none' : '';
+  document.getElementById('ponenciaTableWrap').style.display = isPonencia ? '' : 'none';
+  // La ponencia no registra categoría del participante: el filtro solo aplica al póster.
+  document.getElementById('filterCategoria').style.display   = isPonencia ? 'none' : '';
+  if (isPonencia) { renderPonenciaTable(); return; }
+
   const cases = getFilteredCases();
   const tbody = document.getElementById('resultsBody');
 
@@ -632,7 +587,7 @@ function renderTable() {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
           </svg>
-          <p>No hay evaluaciones registradas${currentTab !== 'todos' ? ' para esta modalidad' : ''}.</p>
+          <p>No hay evaluaciones registradas para esta modalidad.</p>
         </div>
       </td></tr>`;
     return;
@@ -666,6 +621,56 @@ function renderTable() {
   }).join('');
 }
 
+/* ── Tabla de posiciones por servicio (Ponencia Oral) ── */
+function renderPonenciaTable() {
+  const cases = getFilteredCases();
+  const tbody = document.getElementById('ponenciaBody');
+
+  if (!cases.length) {
+    tbody.innerHTML = `
+      <tr><td colspan="7">
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <p>No hay evaluaciones registradas para esta modalidad.</p>
+        </div>
+      </td></tr>`;
+    return;
+  }
+
+  const celdaTipo = t => {
+    if (t.puntaje === null) return `<td class="center" style="color:var(--text-muted)">—</td>`;
+    const titulos = t.casos.map(c => c.titulo || 'Sin título').join(' | ');
+    const extra   = t.casos.length > 1 ? `<span class="score-pct">prom. de ${t.casos.length} casos</span>` : '';
+    return `
+      <td class="center" title="${esc(titulos)}">
+        <span class="score-chip score-ponencia">${t.puntaje} / ${MAX_TIPO_PONENCIA}</span>
+        ${extra}
+      </td>`;
+  };
+
+  tbody.innerHTML = getPonenciaPorServicio(cases).map((s, idx) => {
+    const pos      = idx + 1;
+    const posClass = pos === 1 ? 'pos-1' : pos === 2 ? 'pos-2' : pos === 3 ? 'pos-3' : 'pos-n';
+    const posLabel = pos <= 3 ? `${pos}.º` : `${pos}`;
+    return `
+      <tr class="main-row">
+        <td class="center" style="color:var(--text-muted);font-size:12px">${pos}</td>
+        <td class="center"><span class="pos-badge ${posClass}">${posLabel}</span></td>
+        <td>
+          <strong>${esc(s.servicio)}</strong>
+          <span class="score-pct">${s.nCasos} caso${s.nCasos === 1 ? '' : 's'} evaluado${s.nCasos === 1 ? '' : 's'}</span>
+        </td>
+        ${TIPOS_PONENCIA.map(t => celdaTipo(s.tipos[t])).join('')}
+        <td class="center">
+          <span class="score-chip score-ponencia" style="font-size:15px">${s.total} / ${MAX_TOTAL_PONENCIA}</span>
+          <span class="score-pct">${s.porcentaje.toFixed(1)}%</span>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
 /* ══════════════════════════════════════════════════════════════════
    EXPORTAR CSV
 ══════════════════════════════════════════════════════════════════ */
@@ -673,15 +678,26 @@ function exportCSV() {
   const cases = getFilteredCases();
   if (!cases.length) { alert('No hay registros para exportar.'); return; }
 
-  const headers = ['Posicion', 'Categoria', 'Titulo del Caso', 'Servicio', 'Modalidad',
-                   'Puntaje promedio', 'Puntaje maximo', 'Porcentaje', 'N jurados',
-                   'Jurados', 'Suma de puntajes', 'Fecha'];
-
-  const rows = cases.map((c, i) => [
-    i + 1, c.categoria, c.titulo, c.area, c.modalidad,
-    c.puntaje, c.maxPuntaje, c.porcentaje.toFixed(1) + '%', c.nJurados,
-    c.jurados.join(' | '), c.sumaTotal, formatFecha(c.fecha)
-  ].map(v => `"${String(v ?? '-').replace(/"/g, '""')}"`));
+  let headers, rows;
+  if (currentTab === 'ponencia') {
+    headers = ['Posicion', 'Servicio', 'Caso Clinico Medicina (0-20)', 'Caso Clinico Enfermeria (0-20)',
+               'Caso Clinico Nutricion (0-20)', 'Puntaje en Tabla de Posiciones (0-60)', 'Porcentaje', 'N casos'];
+    rows = getPonenciaPorServicio(cases).map((s, i) => [
+      i + 1, s.servicio,
+      ...TIPOS_PONENCIA.map(t => s.tipos[t].puntaje ?? '-'),
+      s.total, s.porcentaje.toFixed(1) + '%', s.nCasos
+    ]);
+  } else {
+    headers = ['Posicion', 'Categoria', 'Titulo del Caso', 'Servicio', 'Modalidad',
+               'Puntaje promedio', 'Puntaje maximo', 'Porcentaje', 'N jurados',
+               'Jurados', 'Suma de puntajes', 'Fecha'];
+    rows = cases.map((c, i) => [
+      i + 1, c.categoria, c.titulo, c.area, c.modalidad,
+      c.puntaje, c.maxPuntaje, c.porcentaje.toFixed(1) + '%', c.nJurados,
+      c.jurados.join(' | '), c.sumaTotal, formatFecha(c.fecha)
+    ]);
+  }
+  rows = rows.map(r => r.map(v => `"${String(v ?? '-').replace(/"/g, '""')}"`));
 
   const csv  = ['sep=;', [headers, ...rows].map(r => r.join(';')).join('\n')].join('\n');
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });

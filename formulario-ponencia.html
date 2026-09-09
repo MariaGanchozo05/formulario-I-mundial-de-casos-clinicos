@@ -239,27 +239,10 @@ tr:last-child td{border-bottom:none}
         <span class="err-msg" id="err-jurado">Ingrese el nombre del jurado (solo letras).</span>
       </div>
       <div class="field">
-        <label for="categoriaJurado">Categoría Profesional del Jurado</label>
-        <select id="categoriaJurado">
-          <option value="">— Seleccione categoría —</option>
-          <option>Medicina</option>
-          <option>Enfermería</option>
-          <option>Nutrición</option>
-          <option>Docencia / Investigación</option>
-          <option value="Otros">Otros</option>
-        </select>
-        <div id="categoriaJuradoOtraField" hidden>
-          <label for="categoriaJuradoOtra">Especifique la categoría profesional <span class="required">*</span></label>
-          <input id="categoriaJuradoOtra" type="text" disabled placeholder="Ej. Psicología, Odontología, Fisioterapia" aria-describedby="err-categoriaJuradoOtra">
-          <span class="err-msg" id="err-categoriaJuradoOtra">Ingrese la categoría profesional del jurado.</span>
-        </div>
-      </div>
-      <div class="field">
         <label for="fechaEval">Fecha de evaluación</label>
         <input id="fechaEval" type="date">
       </div>
     </div>
-    <p class="note" style="margin-top:10px">Los registros guardados no pueden editarse ni eliminarse desde esta aplicación</p>
   </section>
 
   <!-- ══ 2. SELECCIÓN DEL CASO A EVALUAR ══ -->
@@ -268,8 +251,6 @@ tr:last-child td{border-bottom:none}
       <span class="card-number">2</span>
       <span>SELECCIÓN DEL CASO A EVALUAR</span>
     </div>
-
-    <div class="note">Seleccione la categoría del participante, el servicio y el tipo de caso clínico. Puede calificar múltiples casos en esta sesión antes de guardar.</div>
 
     <!-- Tipo de caso -->
     <label style="font-size:13.5px;font-weight:700;color:var(--primary);display:block;margin-bottom:10px">
@@ -288,31 +269,18 @@ tr:last-child td{border-bottom:none}
     </div>
     <span class="err-msg" id="err-tipo" style="margin-bottom:10px;display:none">Seleccione el tipo de caso clínico.</span>
 
-    <!-- Categoría del participante + Servicio -->
-    <div class="service-row" style="margin-top:6px">
-      <div class="field" style="margin-bottom:0">
-        <label for="categoriaParticipante">Categoría del participante <span class="required">*</span></label>
-        <select id="categoriaParticipante">
-          <option value="">— Seleccione la categoría —</option>
-          <option>Profesional</option>
-          <option>Internado</option>
-          <option>Externado</option>
-          <option>Posgrado</option>
-        </select>
-        <span class="err-msg" id="err-categoria">Seleccione la categoría del participante.</span>
-      </div>
-      <div class="field" style="margin-bottom:0">
-        <label for="areaServicio">Servicio hospitalario <span class="required">*</span></label>
-        <select id="areaServicio">
-          <option value="">— Seleccione el servicio —</option>
-          <option>Cirugía</option>
-          <option>Medicina Interna</option>
-          <option>Ginecología y Obstetricia</option>
-          <option>Pediatría</option>
-          <option>Neonatología</option>
-        </select>
-        <span class="err-msg" id="err-area">Seleccione el servicio hospitalario.</span>
-      </div>
+    <!-- Servicio -->
+    <div class="field" style="margin-top:6px;margin-bottom:0">
+      <label for="areaServicio">Servicio hospitalario <span class="required">*</span></label>
+      <select id="areaServicio">
+        <option value="">— Seleccione el servicio —</option>
+        <option>Cirugía</option>
+        <option>Medicina Interna</option>
+        <option>Ginecología y Obstetricia</option>
+        <option>Pediatría</option>
+        <option>Neonatología</option>
+      </select>
+      <span class="err-msg" id="err-area">Seleccione el servicio hospitalario.</span>
     </div>
     <div class="field" style="margin-top:12px;margin-bottom:0">
       <label for="tituloCaso">Título del caso clínico <span class="required">*</span></label>
@@ -513,27 +481,8 @@ function updateTotal() {
 }
 
 /* ══ AGREGAR CASO A LA COLA ══ */
-function actualizarCategoriaJurado() {
-  const esOtra = document.getElementById('categoriaJurado').value === 'Otros';
-  const input = document.getElementById('categoriaJuradoOtra');
-  document.getElementById('categoriaJuradoOtraField').hidden = !esOtra;
-  input.disabled = !esOtra;
-  input.required = esOtra;
-  input.classList.remove('err');
-  input.removeAttribute('aria-invalid');
-  document.getElementById('err-categoriaJuradoOtra').classList.remove('show');
-}
-
 async function addCaseToQueue() {
   let hasErrors = false;
-  const categoriaSeleccionada = document.getElementById('categoriaJurado').value;
-  const categoriaOtra = document.getElementById('categoriaJuradoOtra');
-  const categoriaJurado = categoriaSeleccionada === 'Otros' ? categoriaOtra.value.trim() : categoriaSeleccionada;
-  const faltaCategoria = categoriaSeleccionada === 'Otros' && !categoriaJurado;
-  categoriaOtra.classList.toggle('err', faltaCategoria);
-  categoriaOtra.setAttribute('aria-invalid', String(faltaCategoria));
-  document.getElementById('err-categoriaJuradoOtra').classList.toggle('show', faltaCategoria);
-  if (faltaCategoria) hasErrors = true;
 
   // Validar jurado (solo primera vez)
   const jurado = document.getElementById('jurado').value.trim();
@@ -556,9 +505,8 @@ async function addCaseToQueue() {
 
   // Validar campos del caso
   const caseFields = [
-    {id:'categoriaParticipante', err:'err-categoria'},
-    {id:'areaServicio',          err:'err-area'},
-    {id:'tituloCaso',            err:'err-titulo'}
+    {id:'areaServicio', err:'err-area'},
+    {id:'tituloCaso',   err:'err-titulo'}
   ];
   caseFields.forEach(f => {
     const el = document.getElementById(f.id);
@@ -583,7 +531,6 @@ async function addCaseToQueue() {
     _sessionId:    Date.now() + Math.random(),
     modalidad:     MODALIDAD,
     tipoCaso:      tipoSeleccionado,
-    categoriaParticipante: document.getElementById('categoriaParticipante').value,
     area:          document.getElementById('areaServicio').value,
     titulo:        document.getElementById('tituloCaso').value.trim(),
     scores:        {...scores},
@@ -600,8 +547,7 @@ async function addCaseToQueue() {
 
   const guardado = await guardarCasoEnBD(registro, {
     jurado,
-    categoriaJurado,
-    fecha:           document.getElementById('fechaEval').value
+    fecha: document.getElementById('fechaEval').value
   });
 
   btn.disabled = false;
@@ -634,7 +580,7 @@ function renderQueue() {
       <span class="qi-pos">${idx+1}</span>
       <div class="qi-info">
         <div class="qi-title">${esc(r.titulo)}</div>
-        <div class="qi-meta">${esc(r.categoriaParticipante)} · ${esc(r.tipoCaso)} · ${esc(r.area)}</div>
+        <div class="qi-meta">${esc(r.tipoCaso)} · ${esc(r.area)}</div>
       </div>
       <span class="qi-score">${r.puntaje} / ${MAX_PUNTAJE}</span>
       <span class="qi-saved">✓ Guardado</span>
@@ -653,8 +599,7 @@ function resetCaseForm() {
   document.getElementById('err-tipo').style.display = 'none';
 
   // Limpiar selects con selectedIndex para garantizar la opción vacía
-  // (NO se toca categoriaJurado: los datos del jurado son fijos para la sesión)
-  ['categoriaParticipante','areaServicio'].forEach(id => {
+  ['areaServicio'].forEach(id => {
     const el = document.getElementById(id); if (el) el.selectedIndex = 0;
   });
 
@@ -676,24 +621,14 @@ function resetCaseForm() {
   document.querySelector('.card:nth-child(2)').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-/* ══ INSERTAR CASO (tolera que falte la columna categoria_participante) ══ */
+/* ══ INSERTAR CASO (la ponencia compite por servicio, no por categoría de participante) ══ */
 async function insertarCaso(registro) {
-  const payload = {
+  const { data, error } = await supabaseClient.from('casos').insert({
     modalidad: registro.modalidad,
     tipo_caso: registro.tipoCaso,
-    categoria_participante: registro.categoriaParticipante || null,
     area: registro.area,
     titulo: registro.titulo
-  };
-  let { data, error } = await supabaseClient.from('casos').insert(payload).select('id').single();
-
-  // Si la columna aun no fue creada en Supabase, se reintenta sin ella para no
-  // bloquear el guardado. Ejecute el ALTER TABLE de supabase-schema.sql.
-  if (error && /categoria_participante/.test(error.message || '')) {
-    console.warn('Falta la columna casos.categoria_participante en Supabase; se guarda sin categoria. Ejecute el ALTER TABLE de supabase-schema.sql.');
-    delete payload.categoria_participante;
-    ({ data, error } = await supabaseClient.from('casos').insert(payload).select('id').single());
-  }
+  }).select('id').single();
   if (error) { alert(`No se pudo guardar el caso en Supabase: ${error.message}`); return null; }
   return data;
 }
@@ -706,7 +641,6 @@ async function guardarCasoEnBD(registro, evaluador) {
   const { error } = await supabaseClient.from('evaluaciones').insert({
     caso_id: caso.id,
     jurado_nombre: evaluador.jurado,
-    categoria_jurado: evaluador.categoriaJurado || null,
     puntaje: registro.puntaje,
     max_puntaje: registro.maxPuntaje,
     puntajes_criterios: registro.scores,
@@ -742,9 +676,6 @@ function nuevaSesion() {
   resetCaseForm();
   // Limpiar datos del jurado también
   document.getElementById('jurado').value = '';
-  document.getElementById('categoriaJurado').value = '';
-  document.getElementById('categoriaJuradoOtra').value = '';
-  actualizarCategoriaJurado();
   document.getElementById('fechaEval').value = fechaHoyLocal();
 }
 
@@ -781,8 +712,6 @@ function esc(str) {
 
 /* ══ INIT ══ */
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('categoriaJurado').addEventListener('change', actualizarCategoriaJurado);
-  actualizarCategoriaJurado();
   document.querySelectorAll('[data-validate="letters"]').forEach(attachLetterRestriction);
   document.querySelectorAll('[data-validate="digits"]').forEach(attachDigitRestriction);
   document.getElementById('fechaEval').value = fechaHoyLocal();
