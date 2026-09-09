@@ -235,27 +235,10 @@ tr:last-child td{border-bottom:none}
         <span class="err-msg" id="err-jurado">Ingrese el nombre del jurado (solo letras).</span>
       </div>
       <div class="field">
-        <label for="categoriaJurado">Categoría Profesional del Jurado</label>
-        <select id="categoriaJurado">
-          <option value="">— Seleccione categoría —</option>
-          <option>Medicina</option>
-          <option>Enfermería</option>
-          <option>Nutrición</option>
-          <option>Docencia / Investigación</option>
-          <option value="Otros">Otros</option>
-        </select>
-        <div id="categoriaJuradoOtraField" hidden>
-          <label for="categoriaJuradoOtra">Especifique la categoría profesional <span class="required">*</span></label>
-          <input id="categoriaJuradoOtra" type="text" disabled placeholder="Ej. Psicología, Odontología, Fisioterapia" aria-describedby="err-categoriaJuradoOtra">
-          <span class="err-msg" id="err-categoriaJuradoOtra">Ingrese la categoría profesional del jurado.</span>
-        </div>
-      </div>
-      <div class="field">
         <label for="fechaEval">Fecha de evaluación</label>
         <input id="fechaEval" type="date">
       </div>
     </div>
-    <p class="note" style="margin-top:10px">Los registros guardados no pueden editarse ni eliminarse desde esta aplicación</p>
   </section>
 
   <!-- ══ 2. SELECCIÓN DEL CASO A EVALUAR ══ -->
@@ -265,50 +248,17 @@ tr:last-child td{border-bottom:none}
       <span>SELECCIÓN DEL CASO A EVALUAR</span>
     </div>
 
-    <div class="note">Seleccione la categoría del participante, el servicio y el tipo de caso clínico. Puede calificar múltiples casos en esta sesión antes de guardar.</div>
-
-    <!-- Tipo de caso -->
-    <label style="font-size:13.5px;font-weight:700;color:var(--primary);display:block;margin-bottom:10px">
-      Tipo de caso clínico <span class="required">*</span>
-    </label>
-    <div class="case-type-grid">
-      <div class="case-type-btn" id="btn-medicina"   onclick="selectTipo('Medicina')">
-        <span class="type-icon">🩺</span>Caso Clínico<br>Medicina
-      </div>
-      <div class="case-type-btn" id="btn-enfermeria" onclick="selectTipo('Enfermería')">
-        <span class="type-icon">💊</span>Caso Clínico<br>Enfermería
-      </div>
-      <div class="case-type-btn" id="btn-nutricion"  onclick="selectTipo('Nutrición')">
-        <span class="type-icon">🥗</span>Caso Clínico<br>Nutrición
-      </div>
-    </div>
-    <span class="err-msg" id="err-tipo" style="margin-bottom:10px;display:none">Seleccione el tipo de caso clínico.</span>
-
-    <!-- Categoría del participante + Servicio -->
-    <div class="service-row" style="margin-top:6px">
-      <div class="field" style="margin-bottom:0">
-        <label for="categoriaParticipante">Categoría del participante <span class="required">*</span></label>
-        <select id="categoriaParticipante">
-          <option value="">— Seleccione la categoría —</option>
-          <option>Profesional</option>
-          <option>Internado</option>
-          <option>Externado</option>
-          <option>Posgrado</option>
-        </select>
-        <span class="err-msg" id="err-categoria">Seleccione la categoría del participante.</span>
-      </div>
-      <div class="field" style="margin-bottom:0">
-        <label for="areaServicio">Servicio hospitalario <span class="required">*</span></label>
-        <select id="areaServicio">
-          <option value="">— Seleccione el servicio —</option>
-          <option>Cirugía</option>
-          <option>Medicina Interna</option>
-          <option>Ginecología y Obstetricia</option>
-          <option>Pediatría</option>
-          <option>Neonatología</option>
-        </select>
-        <span class="err-msg" id="err-area">Seleccione el servicio hospitalario.</span>
-      </div>
+    <!-- Categoría del participante -->
+    <div class="field" style="margin-top:6px;margin-bottom:0">
+      <label for="categoriaParticipante">Categoría del participante <span class="required">*</span></label>
+      <select id="categoriaParticipante">
+        <option value="">— Seleccione la categoría —</option>
+        <option>Profesional</option>
+        <option>Internado</option>
+        <option>Externado</option>
+        <option>Posgrado</option>
+      </select>
+      <span class="err-msg" id="err-categoria">Seleccione la categoría del participante.</span>
     </div>
     <div class="field" style="margin-top:12px;margin-bottom:0">
       <label for="tituloCaso">Título del caso clínico <span class="required">*</span></label>
@@ -423,10 +373,12 @@ const CRITERIA = [
 /* ══ MODALIDAD ══ */
 const MODALIDAD   = 'Póster Científico';
 const MAX_PUNTAJE = 100;
+/* El póster compite por categoría de participante, no por tipo de caso ni
+   servicio; como casos.tipo_caso y casos.area son NOT NULL se guarda este valor. */
+const NO_APLICA   = 'No aplica';
 
 /* ══ ESTADO ══ */
 const scores = {};
-let tipoSeleccionado = '';
 const sessionQueue = [];
 
 /* ══ RESTRICCIONES DE ENTRADA ══ */
@@ -452,16 +404,6 @@ function attachDigitRestriction(el) {
     const c = el.value.replace(/\D/g,'');
     if (el.value !== c) el.value = c;
   });
-}
-
-/* ══ SELECCIÓN DE TIPO ══ */
-function selectTipo(tipo) {
-  tipoSeleccionado = tipo;
-  const map = {'Medicina':'btn-medicina','Enfermería':'btn-enfermeria','Nutrición':'btn-nutricion'};
-  Object.entries(map).forEach(([t, id]) => {
-    document.getElementById(id)?.classList.toggle('active', t === tipo);
-  });
-  document.getElementById('err-tipo').style.display = 'none';
 }
 
 /* ══ RENDERIZAR CRITERIOS (opciones 0,2,4,...20 por criterio) ══ */
@@ -502,27 +444,8 @@ function updateTotal() {
 }
 
 /* ══ AGREGAR CASO A LA COLA ══ */
-function actualizarCategoriaJurado() {
-  const esOtra = document.getElementById('categoriaJurado').value === 'Otros';
-  const input = document.getElementById('categoriaJuradoOtra');
-  document.getElementById('categoriaJuradoOtraField').hidden = !esOtra;
-  input.disabled = !esOtra;
-  input.required = esOtra;
-  input.classList.remove('err');
-  input.removeAttribute('aria-invalid');
-  document.getElementById('err-categoriaJuradoOtra').classList.remove('show');
-}
-
 async function addCaseToQueue() {
   let hasErrors = false;
-  const categoriaSeleccionada = document.getElementById('categoriaJurado').value;
-  const categoriaOtra = document.getElementById('categoriaJuradoOtra');
-  const categoriaJurado = categoriaSeleccionada === 'Otros' ? categoriaOtra.value.trim() : categoriaSeleccionada;
-  const faltaCategoria = categoriaSeleccionada === 'Otros' && !categoriaJurado;
-  categoriaOtra.classList.toggle('err', faltaCategoria);
-  categoriaOtra.setAttribute('aria-invalid', String(faltaCategoria));
-  document.getElementById('err-categoriaJuradoOtra').classList.toggle('show', faltaCategoria);
-  if (faltaCategoria) hasErrors = true;
 
   // Validar jurado
   const jurado = document.getElementById('jurado').value.trim();
@@ -535,18 +458,9 @@ async function addCaseToQueue() {
     document.getElementById('err-jurado').classList.remove('show');
   }
 
-  // Validar tipo
-  if (!tipoSeleccionado) {
-    document.getElementById('err-tipo').style.display = 'block';
-    hasErrors = true;
-  } else {
-    document.getElementById('err-tipo').style.display = 'none';
-  }
-
   // Validar campos del caso
   const fields = [
     {id:'categoriaParticipante', err:'err-categoria'},
-    {id:'areaServicio',          err:'err-area'},
     {id:'tituloCaso',            err:'err-titulo'}
   ];
   fields.forEach(f => {
@@ -571,9 +485,7 @@ async function addCaseToQueue() {
   const registro = {
     _sessionId:    Date.now() + Math.random(),
     modalidad:     MODALIDAD,
-    tipoCaso:      tipoSeleccionado,
     categoriaParticipante: document.getElementById('categoriaParticipante').value,
-    area:          document.getElementById('areaServicio').value,
     titulo:        document.getElementById('tituloCaso').value.trim(),
     scores:        {...scores},
     puntaje:       Object.values(scores).reduce((s,v)=>s+Number(v||0),0),
@@ -589,8 +501,7 @@ async function addCaseToQueue() {
 
   const guardado = await guardarCasoEnBD(registro, {
     jurado,
-    categoriaJurado,
-    fecha:           document.getElementById('fechaEval').value
+    fecha: document.getElementById('fechaEval').value
   });
 
   btn.disabled = false;
@@ -609,9 +520,6 @@ async function addCaseToQueue() {
 }
 
 /* ══ RENDERIZAR COLA ══ */
-const SERVICIOS = ['Cirugía','Medicina Interna','Ginecología y Obstetricia','Pediatría','Neonatología'];
-const TIPOS     = {'Medicina':'🩺','Enfermería':'💊','Nutrición':'🥗'};
-
 function renderQueue() {
   document.getElementById('btnGuardarTodo').disabled = sessionQueue.length === 0;
   document.getElementById('queueCount').textContent = `${sessionQueue.length} caso${sessionQueue.length===1?'':'s'}`;
@@ -626,7 +534,7 @@ function renderQueue() {
       <span class="qi-pos">${idx+1}</span>
       <div class="qi-info">
         <div class="qi-title">${esc(r.titulo)}</div>
-        <div class="qi-meta">${esc(r.categoriaParticipante)} · ${esc(r.tipoCaso)} · ${esc(r.area)}</div>
+        <div class="qi-meta">${esc(r.categoriaParticipante)}</div>
       </div>
       <span class="qi-score">${r.puntaje} / ${MAX_PUNTAJE}</span>
       <span class="qi-saved">✓ Guardado</span>
@@ -637,15 +545,8 @@ function renderQueue() {
 
 /* ══ RESET DEL CASO ACTUAL (sin borrar datos del jurado) ══ */
 function resetCaseForm() {
-  // Limpiar tipo seleccionado
-  tipoSeleccionado = '';
-  ['btn-medicina','btn-enfermeria','btn-nutricion'].forEach(id => {
-    document.getElementById(id)?.classList.remove('active');
-  });
-  document.getElementById('err-tipo').style.display = 'none';
-
   // Limpiar selects con selectedIndex para garantizar la opción vacía
-  ['categoriaParticipante','areaServicio'].forEach(id => {
+  ['categoriaParticipante'].forEach(id => {
     const el = document.getElementById(id); if (el) el.selectedIndex = 0;
   });
 
@@ -671,9 +572,9 @@ function resetCaseForm() {
 async function insertarCaso(registro) {
   const payload = {
     modalidad: registro.modalidad,
-    tipo_caso: registro.tipoCaso,
+    tipo_caso: NO_APLICA,
     categoria_participante: registro.categoriaParticipante || null,
-    area: registro.area,
+    area: NO_APLICA,
     titulo: registro.titulo
   };
   let { data, error } = await supabaseClient.from('casos').insert(payload).select('id').single();
@@ -697,7 +598,6 @@ async function guardarCasoEnBD(registro, evaluador) {
   const { error } = await supabaseClient.from('evaluaciones').insert({
     caso_id: caso.id,
     jurado_nombre: evaluador.jurado,
-    categoria_jurado: evaluador.categoriaJurado || null,
     puntaje: registro.puntaje,
     max_puntaje: registro.maxPuntaje,
     puntajes_criterios: registro.scores,
@@ -731,11 +631,8 @@ function nuevaSesion() {
   sessionQueue.length = 0;
   renderQueue();
   resetCaseForm();
-  document.getElementById('jurado').value        = '';
-  document.getElementById('categoriaJurado').value = '';
-  document.getElementById('categoriaJuradoOtra').value = '';
-  actualizarCategoriaJurado();
-  document.getElementById('fechaEval').value      = fechaHoyLocal();
+  document.getElementById('jurado').value    = '';
+  document.getElementById('fechaEval').value = fechaHoyLocal();
 }
 
 /* ══ MODAL ══ */
@@ -771,8 +668,6 @@ function esc(str) {
 
 /* ══ INIT ══ */
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('categoriaJurado').addEventListener('change', actualizarCategoriaJurado);
-  actualizarCategoriaJurado();
   document.querySelectorAll('[data-validate="letters"]').forEach(attachLetterRestriction);
   document.querySelectorAll('[data-validate="digits"]').forEach(attachDigitRestriction);
   document.getElementById('fechaEval').value = fechaHoyLocal();
