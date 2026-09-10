@@ -7,231 +7,304 @@
 <link rel="icon" href="escudo-msp.jpg" type="image/jpeg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 :root {
   --primary: #123b5d;
+  --primary-deep: #0c2a44;
   --primary-light: #1f6f8f;
+  --primary-tint: #e7eff5;
   --accent: #0b7a75;
+  --accent-deep: #085e5a;
   --accent-light: #e6f4f3;
-  --accent2: #7c3aed;
-  --accent2-light: #ede9fe;
-  --bg: #f4f7f9;
+  --accent2: #584c99;
+  --accent2-deep: #443a78;
+  --accent2-light: #ecebf6;
+  --bg: #f3f6f8;
   --surface: #ffffff;
+  --surface-2: #f8fafb;
   --border: #d5e0e6;
+  --border-soft: #e6edf1;
   --border-focus: #1f6f8f;
-  --text: #26343c;
+  --text: #22313a;
+  --text-soft: #4a5a68;
   --text-muted: #64748b;
   --danger: #b42318;
   --success: #16794c;
   --success-bg: #eaf7f0;
-  --gold: #b7791f;
-  --silver: #64748b;
-  --bronze: #92400e;
-  --shadow-sm: 0 2px 8px rgba(18,59,93,0.06);
-  --shadow-md: 0 8px 28px rgba(18,59,93,0.10);
-  --radius: 14px;
+  --gold: #8a5a10;
+  --gold-bg: #fbefd2;
+  --silver: #4f5d6c;
+  --silver-bg: #e9eef2;
+  --bronze: #7c4a1e;
+  --bronze-bg: #f6e4d5;
+  --ring: 0 0 0 3px rgba(31,111,143,0.18);
+  --shadow-sm: 0 1px 2px rgba(18,59,93,0.05), 0 2px 8px rgba(18,59,93,0.04);
+  --shadow-md: 0 2px 4px rgba(18,59,93,0.05), 0 14px 32px -12px rgba(18,59,93,0.22);
+  --shadow-lg: 0 24px 60px -20px rgba(12,42,68,0.45);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius: var(--radius-lg);
+  --ease: cubic-bezier(0.2,0.7,0.2,1);
+  --z-sticky: 2;
+  --z-modal: 50;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Geist', system-ui, sans-serif; }
 
 .icon { width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-body { background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh; }
+body {
+  background: var(--bg);
+  background-image: radial-gradient(90% 40% at 50% 0%, rgba(31,111,143,0.06), transparent 70%);
+  background-repeat: no-repeat;
+  color: var(--text); line-height: 1.5; min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible { outline: 3px solid rgba(31,111,143,0.35); outline-offset: 2px; }
 
 /* ══ HEADER ══ */
 header {
-  background: linear-gradient(135deg, rgba(18,59,93,0.95), rgba(31,111,143,0.92)), url('BACKGROUND.jpg') center/cover no-repeat;
-  color: #fff; padding: 26px 20px 20px; text-align: center;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  position: relative; isolation: isolate;
+  background: linear-gradient(160deg, rgba(12,42,68,0.96), rgba(18,59,93,0.92) 55%, rgba(31,111,143,0.88)), url('BACKGROUND.jpg') center/cover no-repeat;
+  color: #fff; padding: 26px 20px 22px; text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 12px 40px -20px rgba(12,42,68,0.6);
 }
-.header-brand { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 8px; }
-.header-brand img { width: 52px; height: 52px; border-radius: 50%; background: #fff; padding: 2px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-header h1 { font-size: clamp(17px, 3vw, 26px); font-weight: 800; letter-spacing: -0.4px; }
-header h2 { font-size: clamp(12px, 1.8vw, 15px); font-weight: 500; opacity: 0.9; margin-top: 2px; }
+header::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(60% 90% at 50% 100%, rgba(255,255,255,0.08), transparent 70%);
+}
+.header-brand { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 8px; text-align: left; }
+.header-brand img { width: 52px; height: 52px; border-radius: 50%; background: #fff; padding: 2px; box-shadow: 0 0 0 3px rgba(255,255,255,0.16), 0 6px 16px -6px rgba(12,42,68,0.7); }
+header h1 { font-size: clamp(17px, 3vw, 26px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+header h2 { font-size: clamp(12px, 1.8vw, 15px); font-weight: 500; color: rgba(255,255,255,0.92); margin-top: 2px; }
 .public-tag {
   display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,0.18); backdrop-filter: blur(4px);
-  border-radius: 20px; padding: 4px 14px; font-size: 12.5px; font-weight: 700;
-  margin-top: 10px; letter-spacing: 0.3px;
+  background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.22); backdrop-filter: blur(6px);
+  border-radius: 999px; padding: 5px 14px; font-size: 12.5px; font-weight: 600;
+  margin-top: 12px; letter-spacing: 0.04em;
 }
-.nav-links { margin-top: 12px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.nav-links { margin-top: 12px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
 .nav-links a {
   color: #fff; text-decoration: none; font-size: 13px; font-weight: 600;
-  padding: 5px 12px; border-radius: 6px; background: rgba(255,255,255,0.15);
-  display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;
+  padding: 6px 12px; border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.14);
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease);
 }
-.nav-links a:hover { background: rgba(255,255,255,0.28); }
+.nav-links a:hover { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.3); }
+.nav-links a:active { transform: translateY(1px); }
 
 /* ══ PANEL PRINCIPAL ══ */
-#mainPanel { padding-bottom: 40px; }
+#mainPanel { padding-bottom: 48px; }
 
-.wrap { max-width: 1360px; margin: 0 auto; padding: 28px 16px 0; }
+.wrap { max-width: 1360px; margin: 0 auto; padding: 32px 16px 0; }
 
 /* Barra de control */
 .control-bar {
   display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 16px 20px; margin-bottom: 22px;
+  border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px;
   box-shadow: var(--shadow-sm);
 }
-.control-bar h2 { font-size: 17px; font-weight: 700; color: var(--primary); flex: 1; }
-.tab-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.control-bar h2 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: var(--primary); flex: 1; display: inline-flex; align-items: center; gap: 8px; }
+.tab-group { display: inline-flex; gap: 4px; padding: 4px; background: var(--surface-2); border: 1px solid var(--border-soft); border-radius: var(--radius-sm); }
 .tab {
-  padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700;
-  border: 1.5px solid var(--border); background: #f4f7f9; color: var(--text-muted);
-  cursor: pointer; transition: all 0.18s; display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 600;
+  border: 1px solid transparent; background: transparent; color: var(--text-muted);
+  cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  transition: background 0.18s var(--ease), color 0.18s var(--ease), box-shadow 0.18s var(--ease);
 }
-.tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-.tab:hover:not(.active) { border-color: var(--primary-light); color: var(--primary); background: #edf4f8; }
+.tab.active { background: var(--surface); color: var(--primary); border-color: var(--border); box-shadow: var(--shadow-sm); }
+.tab:hover:not(.active) { color: var(--primary); }
+.tab:active { transform: scale(0.98); }
 
 .btn-action {
-  font-family: inherit; font-size: 13px; font-weight: 700; border: none;
-  border-radius: 8px; padding: 9px 16px; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 7px; transition: filter 0.15s, transform 0.15s;
+  font-family: inherit; font-size: 13px; font-weight: 600; border: 1px solid transparent;
+  border-radius: var(--radius-sm); padding: 9px 16px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 7px;
+  box-shadow: 0 6px 16px -10px rgba(18,59,93,0.6);
+  transition: background 0.15s var(--ease), transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
 }
-.btn-action:hover { filter: brightness(0.94); transform: translateY(-1px); }
-.btn-print { background: var(--primary); color: #fff; }
+.btn-action:hover { transform: translateY(-1px); box-shadow: 0 10px 22px -10px rgba(18,59,93,0.55); }
+.btn-action:active { transform: translateY(0) scale(0.985); box-shadow: none; }
+.btn-print { background: #fff; color: var(--primary); border-color: var(--border); box-shadow: none; }
+.btn-print:hover { background: var(--surface-2); border-color: #b9c9d3; box-shadow: none; }
 .btn-export { background: var(--accent); color: #fff; }
+.btn-export:hover { background: var(--accent-deep); }
 
 /* Stats */
 .stats-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 14px;
-  margin-bottom: 22px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px;
+  margin-bottom: 20px;
 }
 .stat-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-  padding: 16px 18px; box-shadow: var(--shadow-sm);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 16px 18px 15px; box-shadow: var(--shadow-sm);
 }
-.stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.stat-value { font-size: 28px; font-weight: 800; color: var(--primary); margin-top: 4px; }
-.stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.stat-label { font-size: 11.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.stat-value { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: var(--primary); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-variant-numeric: tabular-nums; }
 
 /* Filtros */
 .filters {
-  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; align-items: center;
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center;
 }
 .filters select, .filters input {
-  font-family: inherit; padding: 8px 12px; border: 1.5px solid var(--border);
-  border-radius: 8px; font-size: 13px; background: #fff; color: var(--text);
-  transition: border-color 0.2s;
+  font-family: inherit; padding: 8px 12px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 13px; background: #fff; color: var(--text);
+  box-shadow: inset 0 1px 2px rgba(18,59,93,0.04);
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
-.filters select:focus, .filters input:focus { outline: none; border-color: var(--border-focus); }
+.filters input::placeholder { color: #8b98a8; }
+.filters select:hover, .filters input:hover { border-color: #b9c9d3; }
+.filters select:active { transform: scale(0.985); }
+.filters select:focus, .filters input:focus { outline: none; border-color: var(--border-focus); box-shadow: var(--ring); }
 .filters label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
 
 /* Tabla de resultados (estilo hoja de cálculo) */
 .table-wrap {
   overflow: auto;
   max-height: min(70vh, 720px);
-  border: 1px solid #c5d0d8;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   background: #fff;
   box-shadow: var(--shadow-sm);
 }
-.table-wrap > table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table-wrap > table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; font-variant-numeric: tabular-nums; }
 .table-wrap > table > thead th {
-  position: sticky; top: 0; z-index: 2;
-  background: #eef2f6; color: var(--primary); font-weight: 700;
-  padding: 10px 12px; text-align: left;
-  border: 1px solid #d5dee6; white-space: nowrap;
+  position: sticky; top: 0; z-index: var(--z-sticky);
+  background: var(--surface-2); color: var(--text-soft); font-weight: 600;
+  font-size: 12px; letter-spacing: 0.01em;
+  padding: 11px 12px; text-align: left;
+  border-bottom: 1px solid var(--border); border-right: 1px solid var(--border-soft);
+  box-shadow: 0 1px 0 rgba(18,59,93,0.04);
+  white-space: nowrap;
 }
+.table-wrap > table > thead th:last-child { border-right: none; }
+.table-wrap > table > thead th small { font-weight: 500; color: var(--text-muted); }
 .table-wrap > table > thead th.center { text-align: center; }
 .table-wrap > table > tbody > tr > td {
   padding: 12px;
-  border: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-soft); border-right: 1px solid var(--border-soft);
   vertical-align: middle;
   background: #fff;
+  transition: background 0.15s var(--ease);
 }
-tbody tr.main-row:nth-child(4n+1) td { background: #fafbfc; }
-tbody tr.main-row:hover td { background: #f1f7fa; }
-tbody tr.main-row.open-parent td { background: #f8fafc; }
+.table-wrap > table > tbody > tr > td:last-child { border-right: none; }
+.table-wrap > table > tbody > tr:last-child > td { border-bottom: none; }
+tbody tr.main-row:nth-child(even) td { background: #fbfcfd; }
+tbody tr.main-row:hover td { background: var(--primary-tint); }
+tbody tr.main-row.open-parent td { background: var(--surface-2); }
 td.center { text-align: center; }
+tbody td strong { font-weight: 600; color: var(--text); }
 
 .pos-badge {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 30px; height: 30px; border-radius: 50%; font-weight: 800; font-size: 13px;
+  min-width: 30px; height: 30px; padding: 0 6px; border-radius: var(--radius-sm); font-weight: 700; font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
 }
-.pos-1 { background: #fef3c7; color: var(--gold); }
-.pos-2 { background: #f1f5f9; color: var(--silver); }
-.pos-3 { background: #fef3c7; color: var(--bronze); }
-.pos-n { background: #f4f7f9; color: var(--text-muted); }
+.pos-1 { background: var(--gold-bg); color: var(--gold); box-shadow: inset 0 0 0 1px rgba(138,90,16,0.18); }
+.pos-2 { background: var(--silver-bg); color: var(--silver); box-shadow: inset 0 0 0 1px rgba(79,93,108,0.16); }
+.pos-3 { background: var(--bronze-bg); color: var(--bronze); box-shadow: inset 0 0 0 1px rgba(124,74,30,0.16); }
+.pos-n { background: transparent; color: var(--text-muted); }
 
 .score-chip {
-  display: inline-block; padding: 0; border-radius: 0;
-  font-weight: 700; font-size: 13.5px; background: none;
+  display: inline-block; padding: 0; border-radius: 0; white-space: nowrap;
+  font-weight: 700; font-size: 14px; letter-spacing: -0.01em; background: none;
 }
 .score-poster { color: var(--accent); }
 .score-ponencia { color: var(--accent2); }
 
 .mod-badge {
-  display: inline-block; padding: 3px 9px; border-radius: 6px;
-  font-size: 11.5px; font-weight: 700; letter-spacing: 0.2px;
+  display: inline-block; padding: 3px 9px; border-radius: 6px; white-space: nowrap;
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.01em;
 }
-.mod-poster   { background: #e6f4f3; color: var(--accent); }
-.mod-ponencia { background: var(--accent2-light); color: var(--accent2); }
+.mod-poster   { background: var(--accent-light); color: var(--accent-deep); }
+.mod-ponencia { background: var(--accent2-light); color: var(--accent2-deep); }
 
 .jurado-cell { font-size: 12px; color: var(--text-muted); }
-.obs-cell { font-size: 12px; color: #475569; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.obs-cell { font-size: 12px; color: var(--text-soft); max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Categoría del participante */
 .cat-chip {
-  display: inline-block; padding: 4px 11px; border-radius: 6px;
-  font-size: 11.5px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase;
+  display: inline-block; padding: 4px 10px; border-radius: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
 }
-.cat-profesional { background: #e0f2fe; color: #075985; }
-.cat-internado   { background: #fef3c7; color: #92400e; }
-.cat-externado   { background: #dcfce7; color: #166534; }
-.cat-posgrado    { background: var(--accent2-light); color: #5b21b6; }
-.cat-sin         { background: #f1f5f9; color: var(--text-muted); }
+.cat-profesional { background: #e3eef7; color: #1f4d73; }
+.cat-internado   { background: #f8ead2; color: #7a4c0c; }
+.cat-externado   { background: #e1f1e6; color: #1f5a37; }
+.cat-posgrado    { background: var(--accent2-light); color: var(--accent2-deep); }
+.cat-sin         { background: var(--silver-bg); color: var(--text-muted); }
 .jurados-chip {
-  display: inline-block; background: #f1f5f9; color: var(--text-muted);
-  border-radius: 5px; padding: 2px 7px; font-size: 11px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 24px;
+  background: var(--surface-2); color: var(--text-soft); border: 1px solid var(--border-soft);
+  border-radius: 6px; padding: 0 7px; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums;
 }
-.score-pct { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 1px; }
+.jurados-nombres {
+  list-style: none; margin: 6px 0 0; padding: 0; min-width: 140px; max-width: 220px;
+  font-size: 12px; color: var(--text-soft); text-align: left; overflow-wrap: anywhere;
+}
+.jurados-nombres li + li { margin-top: 4px; }
+.score-pct { display: block; font-size: 11px; font-weight: 500; color: var(--text-muted); margin-top: 2px; font-variant-numeric: tabular-nums; }
+/* Ponencia Oral: la celda vacía marca los tipos que no aplican a ese caso */
+.tipo-vacio { color: var(--text-muted); }
+.tipo-activo { background: var(--accent2-light); }
 
 /* Vacío */
-.empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); }
-.empty-state svg { width: 48px; height: 48px; margin: 0 auto 12px; display: block; opacity: 0.35; }
-.empty-state p { font-size: 14px; }
+.empty-state { text-align: center; padding: 56px 20px; color: var(--text-muted); }
+.empty-state svg { width: 44px; height: 44px; margin: 0 auto 14px; display: block; opacity: 0.4; color: var(--primary-light); }
+.empty-state p { font-size: 14px; max-width: 40ch; margin: 0 auto; text-wrap: balance; }
 
 /* Confirm overlay */
 .confirm-overlay {
   display: none; position: fixed; inset: 0;
-  background: rgba(18,59,93,0.5); backdrop-filter: blur(4px);
-  z-index: 9999; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(12,42,68,0.5); backdrop-filter: blur(6px);
+  z-index: var(--z-modal); align-items: center; justify-content: center; padding: 20px;
 }
 .confirm-overlay.active { display: flex; }
 .confirm-box {
-  background: #fff; border-radius: 14px; max-width: 420px; width: 100%;
-  padding: 28px 24px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.18);
-  animation: scaleIn 0.22s cubic-bezier(0.16,1,0.3,1);
+  background: #fff; border-radius: var(--radius-lg); max-width: 420px; width: 100%;
+  padding: 30px 26px 26px; text-align: center; box-shadow: var(--shadow-lg);
+  animation: scaleIn 0.25s var(--ease);
 }
-@keyframes scaleIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
-.confirm-box h3 { font-size: 18px; font-weight: 800; color: var(--danger); margin-bottom: 10px; }
-.confirm-box p  { font-size: 13.5px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.5; }
+@keyframes scaleIn { from { opacity:0; transform:scale(0.94) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }
+.confirm-box h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; color: var(--danger); margin-bottom: 10px; text-wrap: balance; }
+.confirm-box p  { font-size: 13.5px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.55; }
 .confirm-btns { display: flex; gap: 10px; justify-content: center; }
-.cb-cancel  { background: #e7edf1; color: var(--text); border: none; font-family: inherit; font-weight: 700; border-radius: 9px; padding: 11px 22px; cursor: pointer; font-size: 14px; }
-.cb-confirm { background: var(--danger); color: #fff; border: none; font-family: inherit; font-weight: 700; border-radius: 9px; padding: 11px 22px; cursor: pointer; font-size: 14px; }
+.cb-cancel  { background: #fff; color: var(--text); border: 1px solid var(--border); font-family: inherit; font-weight: 600; border-radius: var(--radius-sm); padding: 11px 22px; cursor: pointer; font-size: 14px; transition: background 0.15s var(--ease), border-color 0.15s var(--ease); }
+.cb-cancel:hover { background: var(--surface-2); border-color: #b9c9d3; }
+.cb-confirm { background: var(--danger); color: #fff; border: 1px solid transparent; font-family: inherit; font-weight: 600; border-radius: var(--radius-sm); padding: 11px 22px; cursor: pointer; font-size: 14px; transition: background 0.15s var(--ease); }
+.cb-confirm:hover { background: #931c13; }
+.cb-cancel:active, .cb-confirm:active { transform: scale(0.985); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
 
 /* Print */
 @media print {
   @page { size: A4 landscape; margin: 10mm; }
   body { background: #fff; }
-  header { background: none !important; color: #000 !important; border-bottom: 2px solid #123b5d; padding: 4px 0 !important; }
+  header { background: none !important; color: #000 !important; border-bottom: 2px solid #123b5d; padding: 4px 0 !important; box-shadow: none; }
   header h1 { font-size: 16px; color: #123b5d; }
   .nav-links, .control-bar button, .tab-group, .filters { display: none !important; }
   .wrap { max-width: 100%; padding: 0; }
   .stats-grid { gap: 6px; }
-  .stat-card { padding: 8px 10px; }
+  .stat-card { padding: 8px 10px; box-shadow: none; }
   .stat-value { font-size: 20px; }
-  .table-wrap { max-height: none; overflow: visible; }
+  .table-wrap { max-height: none; overflow: visible; box-shadow: none; }
   table { font-size: 11px; }
   th, td { padding: 5px 7px; }
 }
 
 @media (max-width: 700px) {
   .control-bar { flex-direction: column; align-items: flex-start; }
+  .tab-group { width: 100%; }
+  .tab { flex: 1; justify-content: center; }
 }
 </style>
 </head>
@@ -308,6 +381,14 @@ td.center { text-align: center; }
         <option>Externado</option>
         <option>Posgrado</option>
       </select>
+      <select id="filterArea" aria-label="Filtrar por servicio" onchange="renderAll()" style="display:none">
+        <option value="">Todos los servicios</option>
+        <option>Cirugía</option>
+        <option>Medicina Interna</option>
+        <option>Ginecología y Obstetricia</option>
+        <option>Pediatría</option>
+        <option>Neonatología</option>
+      </select>
       <input type="text" id="filterSearch" placeholder="Buscar por título…" oninput="renderAll()" style="min-width:220px">
       <select id="filterSort" onchange="renderAll()">
         <option value="score_desc">Mayor puntaje primero</option>
@@ -337,18 +418,20 @@ td.center { text-align: center; }
       </table>
     </div>
 
-    <!-- Tabla de posiciones por servicio (solo Ponencia Oral) -->
+    <!-- Tabla de posiciones (solo Ponencia Oral): un caso por fila, ranking global -->
     <div class="table-wrap" id="ponenciaTableWrap" style="display:none">
       <table>
         <thead>
           <tr>
             <th class="center" style="width:46px">#</th>
             <th class="center" style="width:56px">Pos.</th>
+            <th>Título del Caso</th>
             <th>Servicio</th>
             <th class="center">Caso Clínico<br>Medicina <small>(0–20 pts)</small></th>
             <th class="center">Caso Clínico<br>Enfermería <small>(0–20 pts)</small></th>
             <th class="center">Caso Clínico<br>Nutrición <small>(0–20 pts)</small></th>
-            <th class="center">Puntaje en Tabla<br>de Posiciones <small>(0–60 pts)</small></th>
+            <th class="center">Jurados</th>
+            <th>Fecha</th>
           </tr>
         </thead>
         <tbody id="ponenciaBody"></tbody>
@@ -380,12 +463,10 @@ const CAT_CLASS = {
   'Posgrado':    'cat-posgrado'
 };
 
-/* Tabla de posiciones de Ponencia Oral: un servicio compite con tres casos
-   (Medicina, Enfermería y Nutrición) de 0–20 pts cada uno; total 0–60 pts. */
-const SERVICIOS_PONENCIA = ['Cirugía', 'Medicina Interna', 'Ginecología y Obstetricia', 'Pediatría', 'Neonatología'];
-const TIPOS_PONENCIA     = ['Medicina', 'Enfermería', 'Nutrición'];
-const MAX_TIPO_PONENCIA  = 20;
-const MAX_TOTAL_PONENCIA = MAX_TIPO_PONENCIA * TIPOS_PONENCIA.length;
+/* Tabla de posiciones de Ponencia Oral: cada caso ocupa su propia fila y compite
+   en un ranking global (todos los servicios y tipos juntos) sobre 0–20 pts. */
+const MAX_PONENCIA   = 20;
+const TIPOS_PONENCIA = ['Medicina', 'Enfermería', 'Nutrición'];
 
 /* ══════════════════════════════════════════════════════════════════
    CARGA DE DATOS
@@ -473,7 +554,10 @@ function getFilteredCases() {
   if (currentTab === 'ponencia') cases = cases.filter(c => c.modalidad === 'Ponencia Oral');
 
   const cat = document.getElementById('filterCategoria')?.value;
-  if (cat) cases = cases.filter(c => c.categoria === cat);
+  if (currentTab === 'poster' && cat) cases = cases.filter(c => c.categoria === cat);
+
+  const area = document.getElementById('filterArea')?.value;
+  if (currentTab === 'ponencia' && area) cases = cases.filter(c => c.area === area);
 
   const q = (document.getElementById('filterSearch')?.value || '').toLowerCase();
   if (q) cases = cases.filter(c => (c.titulo || '').toLowerCase().includes(q));
@@ -485,35 +569,6 @@ function getFilteredCases() {
   if (sort === 'date_asc')   cases.sort((a, b) => new Date(a._createdAt) - new Date(b._createdAt));
 
   return cases;
-}
-
-/* Agrupa los casos de Ponencia Oral por servicio. Si un servicio tiene más de
-   un caso del mismo tipo, la celda usa el promedio de esos casos. */
-function getPonenciaPorServicio(cases) {
-  const norm = s => String(s || '').trim().toLowerCase();
-  const servicios = SERVICIOS_PONENCIA.map(servicio => {
-    const deServicio = cases.filter(c => norm(c.area) === norm(servicio));
-    const tipos = {};
-    TIPOS_PONENCIA.forEach(tipo => {
-      const deTipo = deServicio.filter(c => norm(c.tipoCaso) === norm(tipo));
-      const prom   = deTipo.length ? deTipo.reduce((s, c) => s + c.promedio, 0) / deTipo.length : null;
-      tipos[tipo]  = {
-        casos:   deTipo,
-        puntaje: prom === null ? null : Math.round(prom * 10) / 10
-      };
-    });
-    const total = TIPOS_PONENCIA.reduce((s, t) => s + (tipos[t].puntaje || 0), 0);
-    return {
-      servicio, tipos,
-      nCasos: deServicio.length,
-      total:  Math.round(total * 10) / 10,
-      porcentaje: (total / MAX_TOTAL_PONENCIA) * 100
-    };
-  });
-
-  const sort = document.getElementById('filterSort')?.value || 'score_desc';
-  servicios.sort((a, b) => sort === 'score_asc' ? a.total - b.total : b.total - a.total);
-  return servicios;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -575,6 +630,7 @@ function renderTable() {
   document.getElementById('ponenciaTableWrap').style.display = isPonencia ? '' : 'none';
   // La ponencia no registra categoría del participante: el filtro solo aplica al póster.
   document.getElementById('filterCategoria').style.display   = isPonencia ? 'none' : '';
+  document.getElementById('filterArea').style.display        = isPonencia ? '' : 'none';
   if (isPonencia) { renderPonenciaTable(); return; }
 
   const cases = getFilteredCases();
@@ -615,20 +671,24 @@ function renderTable() {
         </td>
         <td class="center">
           <span class="jurados-chip" title="${esc(c.jurados.join(', '))}">${c.nJurados}</span>
+          <ul class="jurados-nombres">${c.evaluaciones.map(e => `<li>${esc(e.jurado || 'Sin nombre registrado')}</li>`).join('')}</ul>
         </td>
         <td style="font-size:12px;white-space:nowrap">${esc(formatFecha(c.fecha))}</td>
       </tr>`;
   }).join('');
 }
 
-/* ── Tabla de posiciones por servicio (Ponencia Oral) ── */
+/* ── Tabla de posiciones (Ponencia Oral): una fila por caso, ranking global ──
+   El puntaje del caso se muestra en la columna de su tipo (Medicina, Enfermería
+   o Nutrición); las otras dos columnas quedan vacías. Así cada columna se lee
+   de arriba abajo para comparar lo calificado por tema. */
 function renderPonenciaTable() {
   const cases = getFilteredCases();
   const tbody = document.getElementById('ponenciaBody');
 
   if (!cases.length) {
     tbody.innerHTML = `
-      <tr><td colspan="7">
+      <tr><td colspan="9">
         <div class="empty-state">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
@@ -639,18 +699,18 @@ function renderPonenciaTable() {
     return;
   }
 
-  const celdaTipo = t => {
-    if (t.puntaje === null) return `<td class="center" style="color:var(--text-muted)">—</td>`;
-    const titulos = t.casos.map(c => c.titulo || 'Sin título').join(' | ');
-    const extra   = t.casos.length > 1 ? `<span class="score-pct">prom. de ${t.casos.length} casos</span>` : '';
+  const norm = t => String(t || '').trim().toLowerCase();
+
+  const celdaTipo = (c, tipo) => {
+    if (norm(c.tipoCaso) !== norm(tipo)) return `<td class="center tipo-vacio">—</td>`;
     return `
-      <td class="center" title="${esc(titulos)}">
-        <span class="score-chip score-ponencia">${t.puntaje} / ${MAX_TIPO_PONENCIA}</span>
-        ${extra}
+      <td class="center tipo-activo">
+        <span class="score-chip score-ponencia">${c.puntaje} / ${c.maxPuntaje || MAX_PONENCIA}</span>
+        <span class="score-pct">${c.porcentaje.toFixed(1)}%</span>
       </td>`;
   };
 
-  tbody.innerHTML = getPonenciaPorServicio(cases).map((s, idx) => {
+  tbody.innerHTML = cases.map((c, idx) => {
     const pos      = idx + 1;
     const posClass = pos === 1 ? 'pos-1' : pos === 2 ? 'pos-2' : pos === 3 ? 'pos-3' : 'pos-n';
     const posLabel = pos <= 3 ? `${pos}.º` : `${pos}`;
@@ -658,15 +718,14 @@ function renderPonenciaTable() {
       <tr class="main-row">
         <td class="center" style="color:var(--text-muted);font-size:12px">${pos}</td>
         <td class="center"><span class="pos-badge ${posClass}">${posLabel}</span></td>
-        <td>
-          <strong>${esc(s.servicio)}</strong>
-          <span class="score-pct">${s.nCasos} caso${s.nCasos === 1 ? '' : 's'} evaluado${s.nCasos === 1 ? '' : 's'}</span>
-        </td>
-        ${TIPOS_PONENCIA.map(t => celdaTipo(s.tipos[t])).join('')}
+        <td><strong>${esc(c.titulo || 'Sin título')}</strong></td>
+        <td>${esc(c.area || '—')}</td>
+        ${TIPOS_PONENCIA.map(t => celdaTipo(c, t)).join('')}
         <td class="center">
-          <span class="score-chip score-ponencia" style="font-size:15px">${s.total} / ${MAX_TOTAL_PONENCIA}</span>
-          <span class="score-pct">${s.porcentaje.toFixed(1)}%</span>
+          <span class="jurados-chip" title="${esc(c.jurados.join(', '))}">${c.nJurados}</span>
+          <ul class="jurados-nombres">${c.evaluaciones.map(e => `<li>${esc(e.jurado || 'Sin nombre registrado')}</li>`).join('')}</ul>
         </td>
+        <td style="font-size:12px;white-space:nowrap">${esc(formatFecha(c.fecha))}</td>
       </tr>`;
   }).join('');
 }
@@ -680,12 +739,16 @@ function exportCSV() {
 
   let headers, rows;
   if (currentTab === 'ponencia') {
-    headers = ['Posicion', 'Servicio', 'Caso Clinico Medicina (0-20)', 'Caso Clinico Enfermeria (0-20)',
-               'Caso Clinico Nutricion (0-20)', 'Puntaje en Tabla de Posiciones (0-60)', 'Porcentaje', 'N casos'];
-    rows = getPonenciaPorServicio(cases).map((s, i) => [
-      i + 1, s.servicio,
-      ...TIPOS_PONENCIA.map(t => s.tipos[t].puntaje ?? '-'),
-      s.total, s.porcentaje.toFixed(1) + '%', s.nCasos
+    const norm = t => String(t || '').trim().toLowerCase();
+    headers = ['Posicion', 'Titulo del Caso', 'Servicio',
+               'Caso Clinico Medicina (0-20)', 'Caso Clinico Enfermeria (0-20)',
+               'Caso Clinico Nutricion (0-20)', 'Porcentaje', 'N jurados',
+               'Jurados', 'Suma de puntajes', 'Fecha'];
+    rows = cases.map((c, i) => [
+      i + 1, c.titulo, c.area,
+      ...TIPOS_PONENCIA.map(t => norm(c.tipoCaso) === norm(t) ? c.puntaje : '-'),
+      c.porcentaje.toFixed(1) + '%', c.nJurados,
+      c.jurados.join(' | '), c.sumaTotal, formatFecha(c.fecha)
     ]);
   } else {
     headers = ['Posicion', 'Categoria', 'Titulo del Caso', 'Servicio', 'Modalidad',
