@@ -66,7 +66,7 @@ function loadForm(file) {
   }
   events.get('DOMContentLoaded')();
   return {
-    html, context, inserts,
+    html, context, inserts, events,
     el: id => document.getElementById(id),
     has: id => elements.has(id),
     fillCriteria() {
@@ -94,7 +94,6 @@ test('formulario-ponencia.html: guarda tipo y servicio sin categoría de partici
   assert.equal(form.has('btn-medicina'), true);
 
   form.el('jurado').value = 'Dra. Ana';
-  form.el('tituloCaso').value = 'Caso de prueba';
   form.fillCriteria();
 
   // Sin tipo ni servicio no se inserta nada.
@@ -103,13 +102,20 @@ test('formulario-ponencia.html: guarda tipo y servicio sin categoría de partici
   assert.equal(form.el('err-tipo').style.display, 'block');
   assert.equal(form.el('areaServicio').classList.contains('err'), true);
 
+  // El título oficial se asigna al elegir tipo de caso y servicio.
   form.context.selectTipo('Enfermería');
+  assert.equal(form.el('tituloCaso').value, '');
   form.el('areaServicio').value = 'Cirugía';
+  form.events.get('areaServicio:change')();
+  assert.equal(form.el('tituloCaso').value, 'Urgencia urológica quirúrgica, GANGRENA DE FOURNIER en paciente de 62 años');
+
   await form.context.addCaseToQueue();
   assert.equal(form.inserts.length, 2);
   assert.equal(form.inserts[0].table, 'casos');
-  assert.deepEqual(plain(form.inserts[0].payload),
-    { modalidad: 'Ponencia Oral', tipo_caso: 'Enfermería', area: 'Cirugía', titulo: 'Caso de prueba' });
+  assert.deepEqual(plain(form.inserts[0].payload), {
+    modalidad: 'Ponencia Oral', tipo_caso: 'Enfermería', area: 'Cirugía',
+    titulo: 'Urgencia urológica quirúrgica, GANGRENA DE FOURNIER en paciente de 62 años'
+  });
   assert.equal(form.inserts[1].table, 'evaluaciones');
   assert.equal('categoria_jurado' in form.inserts[1].payload, false);
   assert.equal(form.inserts[1].payload.jurado_nombre, 'Dra. Ana');
