@@ -344,7 +344,7 @@ tr:last-child td{border-bottom:none}
   <div class="button-row">
     <button type="button" class="btn btn-primary" id="btnGuardarTodo" onclick="finalizarSesion()" disabled>
       <svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      Finalizar sesión y ver resumen
+      Finalizar evaluación
     </button>
     <button type="button" class="btn btn-accent" onclick="exportToPdf()">
       <svg class="icon" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="M7 10l5 5 5-5"/><path d="M20 21H4"/></svg>
@@ -366,11 +366,11 @@ tr:last-child td{border-bottom:none}
     <div class="modal-icon">
       <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
     </div>
-    <h3 class="modal-title">Evaluación guardada correctamente</h3>
-    <p class="modal-desc" id="modalDesc">Los registros han sido almacenados.</p>
+    <h3 class="modal-title">¿Desea terminar la evaluación con los casos que ha evaluado?</h3>
+    <p class="modal-desc" id="modalDesc"></p>
     <div class="modal-actions">
-      <button class="modal-cancel" onclick="closeModal()">Cerrar</button>
-      <button class="modal-confirm" onclick="closeModal();nuevaSesion()">Nueva sesión</button>
+      <button class="modal-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-confirm" onclick="closeModal();nuevaSesion()">Sí</button>
     </div>
   </div>
 </div>
@@ -407,25 +407,25 @@ const MAX_PUNTAJE = 20;
 /* ══ TÍTULOS OFICIALES DE LOS CASOS (por tipo de caso y servicio) ══ */
 const CASE_TITLES = {
   'Medicina': {
-    'Pediatría': 'Glioma pediátrico de bajo grado compatible con astrocitoma pilocítico supratentorial asociado a hidrocefalia, deterioro neurológico y pérdida visual progresiva',
+    'Pediatría': 'Glioma pediátrico de bajo grado compatible con astrocitoma pilocítico supratentorial asociado a hidrocefalia, deterioro neurológico y pérdida visual progresiva.',
     'Ginecología y Obstetricia': 'Uropatía Obstructiva en el Embarazo asociado a Lesión Renal Aguda',
-    'Cirugía': 'Empiema asociado a Derrame pericárdico',
-    'Medicina Interna': 'Hipokalemia asociada a la ingesta de té verde',
-    'Neonatología': 'Hiperamoniemia neonatal persistente como manifestación inicial de un error congénito del metabolismo.'
+    'Cirugía': 'PEQUEÑAS INCISIONES, GRAN TRANSFORMACIÓN: UN CASO DE PECTUS EXCAVATUM TRATADO CON TECNICA DE NUSS',
+    'Medicina Interna': 'Parálisis flácida por secuestro iónico masivo: El valor del potasio urinario frente al consumo crónico de camelia sinensis y suplementos herbarios.',
+    'Neonatología': 'HIPERAMONIEMIA NEONATAL PERSISTENTE COMO MANIFESTACIÓN INICIAL DE UN ERROR CONGÉNITO DEL METABOLISMO. PRESENTACIÓN DE CASO.'
   },
   'Enfermería': {
-    'Pediatría': 'Proceso de atención de enfermería en un preescolar con Neumonía adquirida en la comunidad, hipotonía muscular y Secuelas',
-    'Ginecología y Obstetricia': 'Proceso de Atención de Enfermería en gestante con Insuficiencia Renal Aguda Post-renal secundaria a Estenosis Uretero-piélica Bilateral: A propósito de un caso clínico',
-    'Cirugía': 'Urgencia urológica quirúrgica, GANGRENA DE FOURNIER en paciente de 62 años',
-    'Medicina Interna': 'Proceso de atención de enfermería en una adulta mayor con trombocitopenia inmune y sangrado activo',
-    'Neonatología': 'Hiperamoniemia neonatal persistente como manifestación inicial de un error congénito del metabolismo.'
+    'Pediatría': 'Proceso de atención de enfermería en preescolar con neumonía adquirida en la comunidad, hipotonía muscular y secuelas neurológicas',
+    'Ginecología y Obstetricia': 'Proceso de atención de enfermería en un preescolar con neumonía adquirida en la comunidad, hipotonía muscular y secuelas neurológicas',
+    'Cirugía': 'Gangrena de Fournier en un paciente con paraplejía crónica secundaria, lesión medular L1-L2. Proceso de atención de enfermería.',
+    'Medicina Interna': 'Proceso de atención de enfermería en una adulta mayor con trombocitopenia inmune y sangrado activo.',
+    'Neonatología': 'Caso clínico de Hiperamonemia neonatal persistente'
   },
   'Nutrición': {
-    'Pediatría': 'Abordaje nutricional en paciente pediátrico con tumor benigno encefálico supratentorial y sobrepeso durante hospitalización',
-    'Ginecología y Obstetricia': 'Embarazo, hidronefrosis e injuria renal aguda',
-    'Cirugía': 'Manejo Nutricional en Infección de Partes Blandas y Diabetes Tipo 2 Descompensada',
-    'Medicina Interna': 'Dengue con signos de alarma',
-    'Neonatología': 'Ictericia neonatal de causa nutricional'
+    'Pediatría': 'Abordaje nutricional en paciente pediátrico con tumor benigno encefálico supratentorial y obesidad durante hospitalización',
+    'Ginecología y Obstetricia': 'Embarazo, hidronefrosis en injuria renal aguda',
+    'Cirugía': 'Manejo nutricional en paciente con celulitis en mano y diabetes mellitus tipo II',
+    'Medicina Interna': 'Abordaje nutricional en paciente femenino con dengue más signos de alarma con obesidad tipo 1',
+    'Neonatología': 'Ictericia neonatal de causa nutricional: aporte insuficiente de leche materna'
   }
 };
 
@@ -525,7 +525,9 @@ async function addCaseToQueue() {
   let hasErrors = false;
 
   // Validar jurado (solo primera vez)
-  const jurado = document.getElementById('jurado').value.trim();
+  // Se colapsan los espacios internos para que "Dr.  Juan" y "Dr. Juan" sean el
+  // mismo jurado, igual que hace el indice unico evaluaciones_jurado_caso_unica.
+  const jurado = document.getElementById('jurado').value.trim().replace(/\s+/g, ' ');
   const errJurado = document.getElementById('err-jurado');
   if (!jurado) {
     document.getElementById('jurado').classList.add('err');
@@ -661,15 +663,26 @@ function resetCaseForm() {
   document.querySelector('.card:nth-child(2)').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-/* ══ INSERTAR CASO (la ponencia compite por servicio, no por categoría de participante) ══ */
+/* ══ BUSCAR EL CASO YA REGISTRADO POR OTRO JURADO ══ */
+function buscarCaso(clave) {
+  let consulta = supabaseClient.from('casos').select('id');
+  Object.entries(clave).forEach(([col, val]) => { consulta = consulta.eq(col, val); });
+  return consulta.order('created_at').limit(1).maybeSingle();
+}
+
+/* ══ INSERTAR CASO (la ponencia compite por servicio, no por categoría de participante).
+   Cada caso lo evalúan tres jurados: todos deben compartir la misma fila de `casos`
+   para que el panel de resultados lo muestre una sola vez con sus tres puntajes. ══ */
 async function insertarCaso(registro) {
-  const { data, error } = await supabaseClient.from('casos').insert({
-    modalidad: registro.modalidad,
-    tipo_caso: registro.tipoCaso,
-    area: registro.area,
-    titulo: registro.titulo
-  }).select('id').single();
+  const clave = { modalidad: registro.modalidad, tipo_caso: registro.tipoCaso, area: registro.area };
+  let { data, error } = await buscarCaso(clave);
+  if (!error && !data) {
+    ({ data, error } = await supabaseClient.from('casos').insert({ ...clave, titulo: registro.titulo }).select('id').single());
+    // 23505: otro jurado creó el caso en ese instante (índice único en Supabase); se reutiliza.
+    if (error?.code === '23505') ({ data, error } = await buscarCaso(clave));
+  }
   if (error) { alert(`No se pudo guardar el caso en Supabase: ${error.message}`); return null; }
+  if (!data) { alert('No se pudo identificar el caso en Supabase. Intente guardarlo de nuevo.'); return null; }
   return data;
 }
 
@@ -688,7 +701,10 @@ async function guardarCasoEnBD(registro, evaluador) {
     fecha_evaluacion: evaluador.fecha || null
   });
   if (error) {
-    alert(`No se pudo guardar la evaluaci\u00f3n en Supabase: ${error.message}`);
+    // 23505: el \u00edndice \u00fanico (caso_id, jurado) impide contar dos veces al mismo jurado.
+    alert(error.code === '23505'
+      ? `El jurado "${evaluador.jurado}" ya registr\u00f3 una evaluaci\u00f3n para este caso.`
+      : `No se pudo guardar la evaluaci\u00f3n en Supabase: ${error.message}`);
     return null;
   }
   return caso;
@@ -698,14 +714,15 @@ async function guardarCasoEnBD(registro, evaluador) {
 function finalizarSesion() {
   if (!sessionQueue.length) { alert('A\u00fan no ha guardado ning\u00fan caso en esta sesi\u00f3n.'); return; }
 
-  const jurado = document.getElementById('jurado').value.trim();
+  // Se colapsan los espacios internos para que "Dr.  Juan" y "Dr. Juan" sean el
+  // mismo jurado, igual que hace el indice unico evaluaciones_jurado_caso_unica.
+  const jurado = document.getElementById('jurado').value.trim().replace(/\s+/g, ' ');
   const avg = (sessionQueue.reduce((s,r)=>s+r.puntaje,0)/sessionQueue.length).toFixed(1);
 
   document.getElementById('modalDesc').innerHTML =
     `Jurado: <strong>${esc(jurado)}</strong><br>
-     Casos guardados: <strong>${sessionQueue.length}</strong><br>
-     Puntaje promedio: <strong>${avg} / ${MAX_PUNTAJE} pts</strong><br>
-     <a href="resultados.html" style="color:var(--accent);font-weight:700;text-decoration:none">Ver el panel de resultados \u2192</a>`;
+     Casos evaluados: <strong>${sessionQueue.length}</strong><br>
+     Puntaje promedio: <strong>${avg} / ${MAX_PUNTAJE} pts</strong>`;
   document.getElementById('saveModal').classList.add('active');
 }
 
